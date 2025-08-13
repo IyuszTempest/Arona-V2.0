@@ -1,0 +1,68 @@
+/*Plugins CJS 
+Pencil Sketch Image Converter
+*/
+const fetch = require('node-fetch');
+const uploader = require('../lib/uploadFile'); // Asumsi ada fungsi uploadFile.js
+
+let handler = async (m, { conn, usedPrefix, command }) => {
+    // Definisi fkontak
+    const fkontak = {
+        key: {
+            participants: "0@s.whatsapp.net",
+            remoteJid: "status@broadcast",
+            fromMe: false,
+            id: "Halo"
+        },
+        message: {
+            contactMessage: {
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+            }
+        },
+        participant: "0@s.whatsapp.net"
+    };
+    
+    let q = m.quoted ? m.quoted : m;
+    let mime = (q.msg || q).mimetype || '';
+
+    if (!mime.startsWith('image/')) {
+        return conn.reply(m.chat, `Reply gambar dengan caption *${usedPrefix + command}* untuk diubah menjadi sketsa pensil!`, fkontak);
+    }
+    
+    try {
+        if (!global.lolkey) {
+            return conn.reply(m.chat, 'Maaf, API key Lolhuman belum diisi di config.js. Silakan isi dulu ya, masbro!', fkontak);
+        }
+        
+        await conn.reply(m.chat, global.wait, fkontak);
+
+        let media = await q.download();
+        let imageUrl = await uploader(media);
+        
+        const apiUrl = `https://api.lolhuman.xyz/api/editor/pencil?apikey=${global.lolkey}&img=${encodeURIComponent(imageUrl)}`;
+        
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+        
+        const buffer = await response.buffer();
+        
+        await conn.sendMessage(m.chat, {
+            image: buffer,
+            caption: '✅ Gambar berhasil diubah menjadi sketsa pensil!'
+        }, { quoted: fkontak });
+        
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    } catch (e) {
+        console.error(e);
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+        conn.reply(m.chat, global.eror, fkontak);
+    }
+};
+
+handler.help = ['pencil'];
+handler.tags = ['ai', 'image', 'premium'];
+handler.command = /^(pencil)$/i;
+handler.limit = true;
+handler.premium = true;
+
+module.exports = handler;
