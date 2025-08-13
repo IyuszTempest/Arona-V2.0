@@ -31,7 +31,6 @@ Semua API key harus diisi di file `config.js`, silakan cek langsung di `config.j
 -   📌 **Betabotz Api:** [`Daftar di sini`](https://api.betabotz.eu.org)
 -   📌 **Fgsi Api:** [`Link API`](https://fgsi.koyeb.app/)
 -   📌 **Lolhuman Api:** [`Link API`](https://api.lolhuman.xyz/)
--   📌 **Nvl Api:** [`Link API`](https//ytdlpyton.nvlgroup.my.id/)
 
 ## **Credit**  
 <a href="https://github.com/IyuszTempest"><img src="https://github.com/IyuszTempest.png?size=100" width="100" height="100"></a> | [![Tio](https://github.com/BOTCAHX.png?size=100)](https://github.com/BOTCAHX)  
