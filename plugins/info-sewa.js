@@ -16,7 +16,7 @@ let handler = async (m, { conn }) => {
         },
         message: {
             contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
             }
         },
         participant: "0@s.whatsapp.net"
@@ -34,13 +34,13 @@ let handler = async (m, { conn }) => {
         const push = [
             {
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `💰 7 Hari : *Rp5.000*\n💰 15 Hari : *Rp8.000*\n💰 20 Hari : *Rp15.000*\n💰 30 Hari : *Rp20.000*\n💰 Permanen : *Rp45.000*\n\n\`</> Benefit Premium </>`
+                    text: 💰 7 Hari : *Rp5.000*\n💰 15 Hari : *Rp8.000*\n💰 20 Hari : *Rp15.000*\n💰 30 Hari : *Rp20.000*\n💰 Permanen : *Rp45.000*\n\n\</> Benefit Premium </>`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                    text: `*✅ Benefit*:\n- Unlimited Limit\n- Akses Semua Fitur`
+                    text: *✅ Benefit*:\n- Unlimited Limit\n- Akses Semua Fitur
                 }),
                 header: proto.Message.InteractiveMessage.Header.fromObject({
-                    title: "`</> Premium Bot </>`\n",
+                    title: "</> Premium Bot </>\n",
                     hasMediaAttachment: true,
                     ...premiumImage
                 }),
@@ -48,20 +48,20 @@ let handler = async (m, { conn }) => {
                     buttons: [
                         {
                             name: "cta_url",
-                            buttonParamsJson: `{"display_text":"Order Here!","url":"${global.storelink}"}`
+                            buttonParamsJson: {"display_text":"Order Here!","url":"${global.storelink}"}
                         }
                     ]
                 })
             },
             {
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `💳 3000 Limit : *Rp2.000*\n💳 5000 Limit : *Rp4.000*\n💳 15,000 Limit : *Rp13.000*\n💳 30,000 Limit : *Rp20.000*\n💳 50,000 : *Rp30.000*\n\n\`</> Benefit Tambah Limit </>`
+                    text: 💳 3000 Limit : *Rp2.000*\n💳 5000 Limit : *Rp4.000*\n💳 15,000 Limit : *Rp13.000*\n💳 30,000 Limit : *Rp20.000*\n💳 50,000 : *Rp30.000*\n\n\</> Benefit Tambah Limit </>`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                    text: `*✅ Benefit*:\n- Tidak Takut Kehabisan Limit\n- Beli Limit Tanpa Premium`
+                    text: *✅ Benefit*:\n- Tidak Takut Kehabisan Limit\n- Beli Limit Tanpa Premium
                 }),
                 header: proto.Message.InteractiveMessage.Header.fromObject({
-                    title: "`</> Tambah Limit </>`\n",
+                    title: "</> Tambah Limit </>\n",
                     hasMediaAttachment: true,
                     ...limitImage
                 }),
@@ -69,20 +69,20 @@ let handler = async (m, { conn }) => {
                     buttons: [
                         {
                             name: "cta_url",
-                            buttonParamsJson: `{"display_text":"Order Here!","url":"${global.storelink}"}`
+                            buttonParamsJson: {"display_text":"Order Here!","url":"${global.storelink}"}
                         }
                     ]
                 })
             },
             {
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `💸 7 Hari : *Rp5.000* / Group\n💸 15 Hari : *Rp8.000* / Group\n💸 20 Hari : *Rp13.000* / Group\n💸 25 Hari : *Rp16.000* / Group\n💸 30 Hari : *Rp20.000* / Group\n💸 50 Hari: *Rp30.000* / Group\n\n\`</> Benefit Sewa </>`
+                    text: 💸 7 Hari : *Rp5.000* / Group\n💸 15 Hari : *Rp8.000* / Group\n💸 20 Hari : *Rp13.000* / Group\n💸 25 Hari : *Rp16.000* / Group\n💸 30 Hari : *Rp20.000* / Group\n💸 50 Hari: *Rp30.000* / Group\n\n\</> Benefit Sewa </>`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                    text: `*✅ Benefit*:\n- Auto Welcome\n- Auto Detect NSFW\n- Auto kick`
+                    text: *✅ Benefit*:\n- Auto Welcome\n- Auto Detect NSFW\n- Auto kick
                 }),
                 header: proto.Message.InteractiveMessage.Header.fromObject({
-                    title: "`</> Sewa Bot </>`\n",
+                    title: "</> Sewa Bot </>\n",
                     hasMediaAttachment: true,
                     ...sewaBotImage
                 }),
@@ -90,20 +90,20 @@ let handler = async (m, { conn }) => {
                     buttons: [
                         {
                             name: "cta_url",
-                            buttonParamsJson: `{"display_text":"Order Here!","url":"${global.storelink}"}`
+                            buttonParamsJson: {"display_text":"Order Here!","url":"${global.storelink}"}
                         }
                     ]
                 })
             },
             {
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `Paket Komplit Permanen:\n✨ Hanya *Rp75.000* ✨\n\n\`</> Benefit Paket Komplit </>`
+                    text: Paket Komplit Permanen:\n✨ Hanya *Rp75.000* ✨\n\n\</> Benefit Paket Komplit </>`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                    text: `*✅ Benefit*:\n- Sewa & Premium Permanen\n- Lebih Hemat dan Praktis`
+                    text: *✅ Benefit*:\n- Sewa & Premium Permanen\n- Lebih Hemat dan Praktis
                 }),
                 header: proto.Message.InteractiveMessage.Header.fromObject({
-                    title: "`</> Paket Komplit </>`\n",
+                    title: "</> Paket Komplit </>\n",
                     hasMediaAttachment: true,
                     ...komplitImage
                 }),
@@ -111,7 +111,7 @@ let handler = async (m, { conn }) => {
                     buttons: [
                         {
                             name: "cta_url",
-                            buttonParamsJson: `{"display_text":"Order Here!","url":"${global.storelink}"}`
+                            buttonParamsJson: {"display_text":"Order Here!","url":"${global.storelink}"}
                         }
                     ]
                 })
@@ -121,10 +121,10 @@ let handler = async (m, { conn }) => {
         const bot = generateWAMessageFromContent(m.chat, {
             interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                 body: proto.Message.InteractiveMessage.Body.create({
-                    text: `*Hello, ${m.pushName}!* 👋\nSilahkan cek produk di bawah! Jika berminat, hubungi owner kami.`
+                    text: *Hello, ${m.pushName}!* 👋\nSilahkan cek produk di bawah! Jika berminat, hubungi owner kami.
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.create({
-                    text: `Powered By ${global.wm}`
+                    text: Powered By ${global.wm}
                 }),
                 header: proto.Message.InteractiveMessage.Header.create({
                     hasMediaAttachment: false
@@ -141,13 +141,13 @@ let handler = async (m, { conn }) => {
     } catch (e) {
         console.error("Error di plugin carousel:", e);
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, `Waduh, ada masalah pas nampilin menu sewa. Coba lagi nanti ya!`, fkontak);
+        conn.reply(m.chat, Waduh, ada masalah pas nampilin menu sewa. Coba lagi nanti ya!, fkontak);
     }
 };
 
 handler.help = ["sewabot", "premium"];
 handler.tags = ["main"];
-handler.command = /^(sewa|sewabot|premium|paketkomplit|buylimit|tambahlimit)$/i;
+handler.command = /^(sewa|sewabot|premium|buylimit|tambahlimit)$/i;
 handler.private = false;
 
 module.exports = handler;
