@@ -16,6 +16,10 @@ Arona MD adalah bot WhatsApp berbasis Node.js yang dirancang untuk mempermudah b
 -   ✅ **Type Plugins CJS**
 -   ✅ **Sudah ada lid**
 
+
+![Arona](https://files.catbox.moe/mskrgn.png)
+
+
 ## ⚠️ Perhatian Sebelum Instalasi
 
 -   ❌ **Tidak support** Termux atau panel yang tidak memiliki `ffmpeg`, `imagemagick`, dan `webp`.
