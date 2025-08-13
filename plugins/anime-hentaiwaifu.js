@@ -19,10 +19,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         },
         participant: "0@s.whatsapp.net"
     };
-
-    if (!m.isPrivate) {
-        return conn.reply(m.chat, 'Maaf, fitur ini hanya bisa digunakan di private chat dengan bot.', fkontak);
-    }
     
     try {
         if (!global.lolkey) {
