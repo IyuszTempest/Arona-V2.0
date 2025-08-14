@@ -14,16 +14,12 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
             }
         },
         participant: "0@s.whatsapp.net"
     };
 
-    if (!m.isPrivate) {
-        return conn.reply(m.chat, 'Maaf, fitur ini hanya bisa digunakan di private chat dengan bot.', fkontak);
-    }
-    
     try {
         if (!global.lolkey) {
             return conn.reply(m.chat, 'Maaf, API key Lolhuman belum diisi di config.js. Silakan isi dulu ya, masbro!', fkontak);
@@ -31,16 +27,16 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         
         await conn.reply(m.chat, global.wait, fkontak);
 
-        const apiUrl = `https://api.lolhuman.xyz/api/random/nsfw/ahegao?apikey=${global.lolkey}`;
+        const apiUrl = https://api.lolhuman.xyz/api/random/nsfw/ahegao?apikey=${global.lolkey};
         
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+        if (!response.ok) throw new Error(API error: ${response.statusText});
         
         const buffer = await response.buffer();
         
         await conn.sendMessage(m.chat, {
             image: buffer,
-            caption: '🔞 Ahegao random buat bahan nih'
+            caption: '🔞 Ahegao random buat lu, masbro!'
         }, { quoted: fkontak });
         
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
@@ -53,7 +49,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['ahegao2'];
-handler.tags = ['nsfw', 'premium'];
+handler.tags = ['nsfw'];
 handler.command = /^(ahegao2)$/i;
 handler.premium = true;
 handler.limit = true;
