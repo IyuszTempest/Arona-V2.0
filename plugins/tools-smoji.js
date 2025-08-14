@@ -60,7 +60,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
 handler.help = ['smoji <emoji>'];
 handler.tags = ['maker', 'tools'];
-handler.command = /^(smoji|toimg)$/i;
+handler.command = /^(smoji)$/i;
 handler.limit = true;
 
 module.exports = handler;
