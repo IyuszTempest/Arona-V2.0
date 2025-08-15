@@ -1,91 +1,32 @@
-// Plugins tete search
-// Sumber: https://whatsapp.com/channel/0029VakezCJDp2Q68C61RH2C
+const fetch = require('node-fetch');
 
-const axios = require('axios');
-const { proto, generateWAMessageFromContent, prepareWAMessageMedia } = require('@adiwajshing/baileys');
+const handler = async (m, { text, conn }) => {
+    if (!text) return m.reply("Masukkan kata kunci pencarian TikTok.");
 
-let handler = async (m, { conn, args, text, usedPrefix, command }) => {
-  if (!text) throw (`EX: ${usedPrefix + command} saa senpai~`);
-  try {
-    await m.reply(wait);
+    m.reply("⏳ ᴛᴜɴɢɢᴜɴ, sᴇᴅᴀɴɢ ᴍᴇɴᴄᴀʀɪ....");
 
-    let { title, no_watermark } = await tiktoks(text);
+    try {
+        let url = `https://api.siputzx.my.id/api/s/tiktok?query=${encodeURIComponent(text)}`;
+        let response = await fetch(url);
+        let json = await response.json();
 
-    const noBeton = false; // Ubah ke false jika ingin menggunakan beton
+        if (!json.status || !json.data || json.data.length === 0) {
+            return m.reply("❌ Tidak ditemukan hasil untuk pencarian ini.");
+        }
 
-    const message = {
-      video: { url: no_watermark },
-      caption: `Permintaan oleh ${m.pushName} `,
-      footer: 'Ditenagai oleh Arona Bot Multidevice',
-      ...(noBeton
-        ? { mimetype: 'video/mp4' }
-        : {
-            buttons: [
-              {
-                buttonId: `.ttsearch ${text}`,
-                buttonText: { displayText: 'Berikutnya' },
-                type: 1
-              }
-            ],
-            headerType: 5,
-            viewOnce: true
-          }
-      )
-    };
+        let result = json.data[0]; // Ambil hasil pertama
+        let caption = `🎵 *${result.title}*\n👤 *Author:* ${result.author.nickname} (@${result.author.unique_id})\n📥 *Unduhan:* ${result.download_count}\n❤️ *Likes:* ${result.digg_count}\n💬 *Komentar:* ${result.comment_count}`;
 
-    return await conn.sendMessage(m.chat, message, { quoted: m });
+        let videoUrl = result.play || result.wmplay; // Gunakan link tanpa watermark jika tersedia
 
-  } catch (e) {
-    console.error(e);
-  }
+        await conn.sendMessage(m.chat, { video: { url: videoUrl }, caption }, { quoted: m });
+
+    } catch (error) {
+        console.error("Error fetching TikTok search:", error);
+        return m.reply("❌ Terjadi kesalahan saat mengambil data.");
+    }
 };
 
-handler.help = ["tiktoksearch"];
-handler.tags = ["downloader","premium"];
-handler.command = /^(ttsearch|tiktoksearch)$/i;
-handler.limit = 2;
-handler.register = true;
-handler.premium = true;
-
+handler.help = ['ttsearch'];
+handler.command = ['ttsearch', 'tiktoksearch'];
 module.exports = handler;
-
-async function tiktoks(query) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const response = await axios({
-        method: 'POST',
-        url: 'https://tikwm.com/api/feed/search',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Cookie': 'current_language=en',
-          'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36'
-        },
-        data: {
-          keywords: query,
-          count: 10,
-          cursor: 0,
-          HD: 1
-        }
-      });
-      const videos = response.data.data.videos;
-      if (videos.length === 0) {
-        reject("Tidak ada video ditemukan.");
-      } else {
-        const gywee = Math.floor(Math.random() * videos.length);
-        const videorndm = videos[gywee];
-
-        const result = {
-          title: videorndm.title,
-          cover: videorndm.cover,
-          origin_cover: videorndm.origin_cover,
-          no_watermark: videorndm.play,
-          watermark: videorndm.wmplay,
-          music: videorndm.music
-        };
-        resolve(result);
-      }
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
