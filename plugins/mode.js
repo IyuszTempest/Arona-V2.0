@@ -56,7 +56,7 @@ let handler = async (m, { conn, prefix }) => {
 │⚙️ *Total Perintah Dicoba:* ${featuresUsedCount} Perintah
 │
 ├─◈「 ✨ *INFO* ✨ 」◈─
-│ Aku adalah Arona, asisten pribadimu!
+│ Aku adalah ${global.namebot}, asisten pribadimu!
 │ Jika tidak ada balasan dalam beberapa saat,
 │ kemungkinan bot sedang istirahat atau
 │ ada pemeliharaan. Mohon bersabar ya! 🙏
