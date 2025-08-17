@@ -12,14 +12,14 @@ global.numbercreator = '6285750351830' //kalau ga ada jangan diubah takut error
 global.numbersponsor = '6285872169153' //kalau ga ada jangan diubah takut error
 global.storelink = 'https://wa.me/6285245307548' //masukin kayak gitu biar kalau ada orang yang tertarik ama sewa bot lu
 global.mail = 'aronamail@desu' //bebas mau kek mana, jangan dikosongin
-global.mailowmer = 'iyusztempest@gmail.com' //biarin aja kalau mau privat
+global.mailowmer = 'iyusztempest@gmail.com' //wajib masukin, ini juga termasuk akun mega lu
 global.mailcreator = 'thecreator@mail.co.id' //biarin aja jangan diubah
 global.mailsponsor = 'thesponsor@mail.com' //biarin aja jangan diubah
 global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau ch atau gc
 global.instagramowner = 'https://www.instagram.com/iyusz_tempest?igsh=MWdoemNtdmoxdTBzbA==' //wajib
 global.websiteowner = 'https://linkbio.iyusztempest.biz.id' //kalau ga ada ya biarin aja biar ga error
 global.wm = '© Arona Bot Multidevice' //wm bot
-global.pwmega = 'passwormegalu' //ini password akun mega lu, buat plugin up mega)
+global.pwmega = 'passwordmegalu' //ini password akun mega lu, buat plugin up mega)
 
 
 
