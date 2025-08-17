@@ -10,8 +10,8 @@ const { sizeFormatter } = require('human-readable')
 const path = require('path')
 
 // Akun Mega.nz
-const email = ${global.mailowner}
-const password = ${global.pwmega}
+const email = `${global.mailowner}`;
+const password = `${global.pwmega}`;
 
 // Format ukuran file
 const formatSize = sizeFormatter({
@@ -43,7 +43,7 @@ async function uploadMega(fileName, buffer) {
 let handler = async (m, { conn }) => {
   let q = m.quoted ? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
-  if (!mime) return m.reply('⚠️ Reply file dengan command *.upmeganz*')
+  if (!mime) return m.reply('⚠️ Reply file dengan command *.upmega*')
 
   let buffer = await q.download()
   if (!buffer) return m.reply('❌ Gagal download file')
