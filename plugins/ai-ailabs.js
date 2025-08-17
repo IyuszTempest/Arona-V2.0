@@ -1,7 +1,10 @@
 /*Plugins CJS 
 AI Image & Video Generator (Ailabs)
-*Sumber:* _https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635_
+*Scaraper by NB Script*
+*Sumber Scrape:* _https://whatsapp.com/channel/0029Vb5EZCjIiRotHCI1213_
+*Convert Plugins CJS:* _https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635_
 */
+
 const axios = require('axios');
 const chalk = require('chalk');
 const FormData = require('form-data');
