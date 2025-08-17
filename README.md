@@ -46,3 +46,7 @@ Owner Bot Arona | Yang punya base
 
 ## 📢 Informasi & Update
 📢 **WhatsApp Channel:** [Klik di sini](https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c)
+
+📌 Jika ada plugins yang belum ditaruh credit kalian, silahkan hubungi saya agar di add credit di plugins script ini!!
+**Hubungi Via WhatsApp:** [Hubungi Sekarang]
+(https://wa.me/message/TTWL53ZARYQBK1)
