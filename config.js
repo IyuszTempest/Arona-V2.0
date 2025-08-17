@@ -19,6 +19,7 @@ global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau 
 global.instagramowner = 'https://www.instagram.com/iyusz_tempest?igsh=MWdoemNtdmoxdTBzbA==' //wajib
 global.websiteowner = 'https://linkbio.iyusztempest.biz.id' //kalau ga ada ya biarin aja biar ga error
 global.wm = '© Arona Bot Multidevice' //wm bot
+global.wm2 = 'By IyuszTempest'
 global.pwmega = 'passwordmegalu' //ini password akun mega lu, buat plugin up mega)
 
 
@@ -29,7 +30,7 @@ global.gambarsewa1 = 'https://files.catbox.moe/ml8yts.jpg' //dari plugins info-s
 global.gambarsewa2 = 'https://files.catbox.moe/t0a7im.jpg'
 global.gambarsewa3 = 'https://files.catbox.moe/ftgesl.jpg'
 global.gambarsewa4 = 'https://files.catbox.moe/yl9k3i.jpg'
-
+global.fallbackthumb = 'https://files.catbox.moe/lmzwvb.jpg'
 
 
 //#Settings Loading
