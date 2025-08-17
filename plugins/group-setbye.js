@@ -1,21 +1,18 @@
-let handler = async (m, { args }) => {
-    let db = global.db.data.chats[m.chat]
-    if (!args[0]) return m.reply("Contoh:\n.goodbye on / .goodbye off")
+let handler = async (m, { text }) => {
+    if (!text) return m.reply(
+        "Contoh:\n.setgoodbye Selamat tinggal @user 👋, semoga betah di luar @group ✨"
+    )
 
-    if (args[0].toLowerCase() === 'on') {
-        db.goodbye = true
-        m.reply("✅ Goodbye berhasil diaktifkan!")
-    } else if (args[0].toLowerCase() === 'off') {
-        db.goodbye = false
-        m.reply("❌ Goodbye berhasil dimatikan!")
-    } else {
-        m.reply("Gunakan: .goodbye on / .goodbye off")
-    }
+    let db = global.db.data.chats[m.chat]
+    db.goodbye = true
+    db.goodbyeText = text
+
+    m.reply("✅ Pesan goodbye berhasil diatur!\n\n" + text)
 }
 
-handler.help = ['goodbye <on/off>']
+handler.help = ['setgoodbye']
 handler.tags = ['group']
-handler.command = /^goodbye$/i
+handler.command = /^setgoodbye$/i
 handler.group = true
 handler.admin = true
 
