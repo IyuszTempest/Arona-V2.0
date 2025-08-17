@@ -19,6 +19,7 @@ global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau 
 global.instagramowner = 'https://www.instagram.com/iyusz_tempest?igsh=MWdoemNtdmoxdTBzbA==' //wajib
 global.websiteowner = 'https://linkbio.iyusztempest.biz.id' //kalau ga ada ya biarin aja biar ga error
 global.wm = '© Arona Bot Multidevice' //wm bot
+global.pwmega = 'passwormegalu' //ini password akun mega lu, buat plugin up mega)
 
 
 
