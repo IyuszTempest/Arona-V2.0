@@ -51,6 +51,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 handler.help = ['ahegao2'];
 handler.tags = ['nsfw'];
 handler.command = /^(ahegao2)$/i;
+handler.nsfw = true;
 handler.premium = true;
 handler.limit = true;
 
