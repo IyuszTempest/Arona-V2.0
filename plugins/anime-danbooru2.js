@@ -34,7 +34,7 @@ let handler = async (m, { conn, args, command }) => {
       if (i < data.length - 1) out += `────────────────────────────\n`;
     });
 
-    out += `\n\n© HATSUNE MIKU V13 BY ALFAT. SYAH`;
+    out += `\n\n${global.wm2}`;
 
     m.reply(out);
 
