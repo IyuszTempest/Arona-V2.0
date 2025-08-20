@@ -57,6 +57,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 handler.help = ['konachan <query>'];
 handler.tags = ['nsfw', 'premium', 'anime'];
 handler.command = /^(konachan|ksearch)$/i;
+handler.nsfw = true;
 handler.premium = true;
 handler.limit = true;
 
