@@ -71,6 +71,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 handler.help = ['nhentaisearch <query>'];
 handler.tags = ['nsfw', 'premium'];
 handler.command = /^(nhentaisearch)$/i;
+handler.nsfw = true;
 handler.limit = true;
 handler.premium = true;
 
