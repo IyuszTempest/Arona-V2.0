@@ -1,3 +1,9 @@
+/*
+sumber code ESM: https://whatsapp.com/channel/0029Vb6D8o67YSd1UzflqU1d/701
+Code Origin by Takashi
+convert to CJS by F4F611
+*/
+
 const Jimp = require('jimp')
 
 let handler = async (m, { conn, args }) => {
