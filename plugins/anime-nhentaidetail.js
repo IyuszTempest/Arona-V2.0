@@ -68,6 +68,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 handler.help = ['nhentaidetail <id>'];
 handler.tags = ['nsfw', 'premium'];
 handler.command = /^(nhentaidetail)$/i;
+handler.nsfw = true;
 handler.limit = true;
 handler.premium = true;
 
