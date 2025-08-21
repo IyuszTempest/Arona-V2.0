@@ -40,9 +40,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['meme3'];
+handler.help = ['meme2'];
 handler.tags = ['image', 'fun', 'internet'];
-handler.command = /^(meme3)$/i;
+handler.command = /^(meme2)$/i;
 handler.premium = false;
 
 module.exports = handler;
