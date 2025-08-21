@@ -1,49 +1,80 @@
-const fetch = require("node-fetch");
+/*Plugins CJS 
+Random Lahelu 
+By IyuszTempest
+https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635
+*/
+const fetch = require('node-fetch');
 
-let handler = async (m, { 
-    conn, 
-    usedPrefix, 
-    command 
-}) => {
-    await conn.reply(m.chat, 'Fetching data...', m);
-    
-    try {
-        // Mengambil data dari API
-        let response = await fetch('https://api.siputzx.my.id/api/r/lahelu');
-        let data = await response.json();
+function getMediaType(url) {
+    const ext = url.split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+        return 'image';
+    }
+    if (['mp4', 'webm', 'mov'].includes(ext)) {
+        return 'video';
+    }
+    return null;
+}
 
-        // Memeriksa apakah data berhasil diambil
-        if (data && data.status) {
-            let posts = data.data; // Mengambil array data postingan
-            if (posts.length > 0) {
-                let result = posts.map(post => {
-                    return `**Judul:** ${post.title}\n` +
-                           `**Total Upvotes:** ${post.totalUpvotes}\n` +
-                           `**Total Downvotes:** ${post.totalDownvotes}\n` +
-                           `**Total Comments:** ${post.totalComments}\n` +
-                           `**Dibuat Oleh:** [${post.userInfo.username}](https://lahelu.com/user/${post.userInfo.username})\n` +
-                           `**Link Post:** [Lihat Post](https://lahelu.com/post/${post.postId})\n` +
-                           `**Media:** ${post.content.map(content => content.value).join('\n')}\n\n`;
-                }).join('---\n\n');
-
-                // Mengirimkan hasil ke pengguna
-                await m.reply(result);
-            } else {
-                await m.reply('Tidak ada hasil yang ditemukan.');
+let handler = async (m, { conn, usedPrefix, command }) => {
+    const fkontak = {
+        key: {
+            participants: "0@s.whatsapp.net",
+            remoteJid: "status@broadcast",
+            fromMe: false,
+            id: "Halo"
+        },
+        message: {
+            contactMessage: {
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
             }
-        } else {
-            await m.reply('Terjadi kesalahan saat mengambil data.');
+        },
+        participant: "0@s.whatsapp.net"
+    };
+
+    try {
+        await conn.reply(m.chat, global.wait, fkontak);
+
+        const apiUrl = `https://iyusztempest.my.id/api/lahelu`;
+        
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+        
+        const data = await response.json();
+        
+        if (!data || !data.media || !data.media.url) {
+            return conn.reply(m.chat, 'Gagal mendapatkan media dari Lahelu.', fkontak);
         }
+
+        const mediaUrl = data.media.url;
+        const mediaType = getMediaType(mediaUrl);
+
+        if (mediaType === 'image') {
+            await conn.sendMessage(m.chat, {
+                image: { url: mediaUrl },
+                caption: 'Nih, meme random buat lu 🗿'
+            }, { quoted: fkontak });
+        } else if (mediaType === 'video') {
+            await conn.sendMessage(m.chat, {
+                video: { url: mediaUrl },
+                caption: 'Nih, meme random buat lu 🗿'
+            }, { quoted: fkontak });
+        } else {
+            return conn.reply(m.chat, `Tipe media tidak dikenali: ${mediaUrl}`, fkontak);
+        }
+        
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
     } catch (e) {
-        console.log(e);
-        await m.reply(`[ ! ] Terjadi kesalahan saat mengambil data.`);
+        console.error(e);
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+        conn.reply(m.chat, global.eror, fkontak);
     }
 };
 
 handler.help = ['lahelu'];
-handler.command = ['lahelu'];
-handler.tags = ['internet'];
-handler.premium = false;
+handler.tags = ['fun', 'internet'];
+handler.command = /^(lahelu)$/i;
 handler.limit = true;
 
 module.exports = handler;
