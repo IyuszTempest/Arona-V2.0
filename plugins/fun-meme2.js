@@ -7,8 +7,8 @@ await conn.sendFile(m.chat, img, 'file.jpg', wm, m)
 throw `Error ${eror}`
  }
 }
-handler.command = /^(meme2)$/i
+handler.command = /^(meme)$/i
 handler.tags = ['fun','image']
-handler.help = ['meme2']
+handler.help = ['meme']
 handler.limit = true
 module.exports = handler
