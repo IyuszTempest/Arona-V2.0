@@ -6,8 +6,18 @@
 
 const fetch = require('node-fetch');
 
+function getMediaType(url) {
+    const ext = url.split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png'].includes(ext)) {
+        return 'image';
+    }
+    if (['mp4'].includes(ext)) {
+        return 'video';
+    }
+    return null;
+}
+
 let handler = async (m, { conn, usedPrefix, command }) => {
-    // Definisi fkontak
     const fkontak = {
         key: {
             participants: "0@s.whatsapp.net",
@@ -33,25 +43,25 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         
         const data = await response.json();
         
-        if (!data || !data.media || !data.media.url || !data.media.type) {
+        if (!data || !data.media || !data.media.url) {
             return conn.reply(m.chat, 'Gagal mendapatkan meme dari API.', fkontak);
         }
 
         const mediaUrl = data.media.url;
-        const mediaType = data.media.type;
+        const mediaType = getMediaType(mediaUrl);
 
         if (mediaType === 'image') {
             await conn.sendMessage(m.chat, {
                 image: { url: mediaUrl },
-                caption: '「Asupan Meme Wak 🗿」'
+                caption: '「Asupan Meme Buat Lu 🗿」'
             }, { quoted: fkontak });
         } else if (mediaType === 'video') {
             await conn.sendMessage(m.chat, {
                 video: { url: mediaUrl },
-                caption: '「Asupan Meme Wak🗿」'
+                caption: '「Asupan Meme Buat Lu 🗿」'
             }, { quoted: fkontak });
         } else {
-            return conn.reply(m.chat, `Tipe media tidak dikenali: ${mediaType}`, fkontak);
+            return conn.reply(m.chat, `Tipe media tidak dikenali dari URL.`, fkontak);
         }
         
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
