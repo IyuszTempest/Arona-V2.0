@@ -1,5 +1,5 @@
 /*Plugins CJS 
-Random Meme Generator
+Random Meme
 */
 const fetch = require('node-fetch');
 
@@ -40,9 +40,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['meme2'];
+handler.help = ['meme3'];
 handler.tags = ['image', 'fun', 'internet'];
-handler.command = /^(meme2)$/i;
+handler.command = /^(meme3)$/i;
 handler.premium = false;
 
 module.exports = handler;
