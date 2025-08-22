@@ -16,7 +16,7 @@ const handler = async (m, { conn }) => {
     const uploadedUrl = await uploadFile(imgBuffer)
     if (!uploadedUrl) throw '❌ Gagal upload gambar.'
 
-    const apiUrl = https://api.privatezia.biz.id/api/generator/hdr?url=${encodeURIComponent(uploadedUrl)}
+    const apiUrl = `https://api.privatezia.biz.id/api/generator/hdr?url=${encodeURIComponent(uploadedUrl)}`
     const { data } = await axios.get(apiUrl, { responseType: 'arraybuffer' })
 
     await conn.sendFile(m.chat, data, 'hdr.jpg', '✅ Gambar berhasil diperjelas (HDR)', m)
