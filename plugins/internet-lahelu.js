@@ -35,7 +35,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
         await conn.reply(m.chat, global.wait, fkontak);
 
-        const apiUrl = `https://iyusztempest.my.id/api/lahelu`;
+        const apiUrl = `https://iyusztempest.my.id/api/fun/lahelu`;
         
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`API error: ${response.statusText}`);
