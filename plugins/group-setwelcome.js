@@ -5,7 +5,7 @@ let handler = async (m, { text }) => {
 
     let db = global.db.data.chats[m.chat]
     db.welcome = true
-    db.welcomeText = text
+    db.setWelcome = text
 
     m.reply("✅ Pesan welcome berhasil diatur!\n\n" + text)
 }
