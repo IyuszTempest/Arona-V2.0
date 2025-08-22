@@ -4,119 +4,110 @@
  * dalam format vCard (kartu kontak) dengan custom quoted message.
  **/
 
-// Pastikan variabel global ini sudah didefinisikan di file utama bot lo
-// Kalau belum ada, nilainya akan menggunakan default di bawah.
-var nameowner = global.nameowner;
-var numberowner = global.numberowner;
-var gmailowner = global.mailowner;
-var instagramowner = global.instagramowner;
-var websiteowner = global.websiteowner;
+const handler = async (m, { conn }) => {
+    try {
+        const nameowner = global.nameowner;
+        const numberowner = global.numberowner;
+        const gmailowner = global.mailowner;
+        const instagramowner = global.instagramowner;
 
-var namecreator = global.namecreator;
-var numbercreator = global.numbercreator;
-var gmailcreator = global.mailcreator;
+        const namecreator = global.namecreator;
+        const numbercreator = global.numbercreator;
+        const gmailcreator = global.mailcreator;
 
-var namesponsor = global.namesponsor;
-var numbersponsor = global.numbersponsor;
-var gmailsponsor = global.mailsponsor;
+        const namesponsor = global.namesponsor;
+        const numbersponsor = global.numbersponsor;
+        const gmailsponsor = global.mailsponsor;
 
-// Variabel untuk informasi bot (biasanya sudah ada di global bot)
-var botname = global.botname;
-var botnumber = conn.user.jid.split('@')[0]; // Nomor bot dari koneksi langsung
+        const botname = global.botname ?? conn.user.name;
+        const botnumber = conn.user.id.split('@')[0];
 
-var handler = async (m, { conn }) => {
+        const fkontak = {
+            key: {
+                participants: "0@s.whatsapp.net",
+                remoteJid: "status@broadcast",
+                fromMe: false,
+                id: "Halo"
+            },
+            message: {
+                contactMessage: {
+                    vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${nameowner};Bot;;;\nFN:${nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                }
+            },
+            participant: "0@s.whatsapp.net"
+        };
 
-    // Custom quoted message (fkontak)
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo" // ID pesan sembarang
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${nameowner};Bot;;;\nFN:${nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-            }
-        },
-        participant: "0@s.whatsapp.net"
-    };
-
-    // --- Kontak Owner ---
-    const vcardOwner = `BEGIN:VCARD
+        const vcardOwner = `BEGIN:VCARD
 VERSION:3.0
-N:${nameowner};Bot;;;
-FN: ${nameowner} (Owner)
-ORG:Owner Bot
-TEL;waid=${numberowner}:${numberowner}@s.whatsapp.net
-X-ABLabel:Nomor Owner Bot
-EMAIL;type=INTERNET:${gmailowner}
-X-ABLabel:Email Owner
-ADR:;;🇮🇩 Indonesia;;;;
+N:${nameowner};;;
+FN:${nameowner}
+ORG:Owner-sama 👑
+TEL;type=CELL;type=VOICE;waid=${numberowner}:${numberowner}
 URL:${instagramowner}
-X-ABLabel:Instagram Owner
+EMAIL:${gmailowner}
+NOTE:Ini Owner-ku, orangnya baik lho!
+ADR:;;Indonesia;;;;
 END:VCARD`;
 
-    // --- Kontak Creator ---
-    const vcardCreator = `BEGIN:VCARD
+        const vcardCreator = `BEGIN:VCARD
 VERSION:3.0
-N:${namecreator};Bot;;;
-FN: ${namecreator} (Creator)
-ORG:Creator Bot
-TEL;waid=${numbercreator}:${numbercreator}@s.whatsapp.net
-X-ABLabel:Nomor Creator
-EMAIL;type=INTERNET:${gmailcreator}
-X-ABLabel:Email Creator
-ADR:;;🇮🇩 Indonesia;;;;
+N:${namecreator};;;
+FN:${namecreator}
+ORG:Creator 🎨
+TEL;type=CELL;type=VOICE;waid=${numbercreator}:${numbercreator}
+EMAIL:${gmailcreator}
+NOTE:Senpai yang buat aku! Sugoi!
+ADR:;;Indonesia;;;;
 END:VCARD`;
 
-    // --- Kontak Sponsor ---
-    const vcardSponsor = `BEGIN:VCARD
+        const vcardSponsor = `BEGIN:VCARD
 VERSION:3.0
-N:${namesponsor};Bot;;;
-FN: ${namesponsor} (Sponsor)
-ORG:Sponsor Bot
-TEL;waid=${numbersponsor}:${numbersponsor}@s.whatsapp.net
-X-ABLabel:Nomor Sponsor
-EMAIL;type=INTERNET:${gmailsponsor}
-X-ABLabel:Email Sponsor
-ADR:;;🇮🇩 Indonesia;;;;
+N:${namesponsor};;;
+FN:${namesponsor}
+ORG:Sponsor 💖
+TEL;type=CELL;type=VOICE;waid=${numbersponsor}:${numbersponsor}
+EMAIL:${gmailsponsor}
+NOTE:Sponsor-chan yang baik hati! Arigatou~
+ADR:;;Indonesia;;;;
 END:VCARD`;
 
-    // --- Kontak Bot ---
-    const vcardBot = `BEGIN:VCARD
+        const vcardBot = `BEGIN:VCARD
 VERSION:3.0
-N:${namebot};Bot;;;
-FN: ${namebot}
-ORG:Whatsapp Bot
-TEL;waid=${botnumber}:${botnumber}@s.whatsapp.net
-X-ABLabel:Nomor Bot
-ADR:;;🇮🇩 Indonesia;;;;
+N:${botname};;;
+FN:${botname}
+ORG:Bot 🤖
+TEL;type=CELL;type=VOICE;waid=${botnumber}:${botnumber}
+NOTE:Ini nomor aku, jangan di-spam ya, Onii-chan! >.<
+ADR:;;Indonesia;;;;
 END:VCARD`;
 
-    // Mengirim beberapa vCard dalam satu pesan kontak
-    const sentMsg  = await conn.sendMessage(
-        m.chat,
-        { 
-            contacts: { 
-                displayName: `Owner, Creator, Sponsor, & Bot`, // Nama tampilan di list kontak
-                contacts: [
-                    { vcard: vcardOwner },
-                    { vcard: vcardCreator },
-                    { vcard: vcardSponsor },
-                    { vcard: vcardBot } // Tambahkan kontak bot di sini
-                ] 
-            }
-        },
-        { quoted: fkontak } // Menggunakan fkontak sebagai quoted message
-    );
+        // --- Jurus Kirim Pesan: Final Attack! ---
+        const sentMsg = await conn.sendMessage(
+            m.chat,
+            {
+                contacts: {
+                    displayName: `Kontak Penting Bot ✨`,
+                    contacts: [
+                        { vcard: vcardOwner },
+                        { vcard: vcardCreator },
+                        { vcard: vcardSponsor },
+                        { vcard: vcardBot }
+                    ]
+                }
+            },
+            { quoted: fkontak }
+        );
 
-    // Reply dengan pesan teks, dan gunakan sentMsg sebagai quoted message
-    await conn.reply(m.chat, "Ini adalah kontak Owner, Creator, Sponsor, dan nomor bot kami!", sentMsg);
+        await conn.reply(m.chat, `Moshi moshi, ${m.pushName}! Ini daftar kontak pentingnya ya. Disimpan baik-baik, jangan sampai hilang! 😉`, sentMsg);
+
+    } catch (e) {
+        console.error(e);
+        m.reply('Gomenasai, Senpai! Ada yang salah pas aku mau kasih info kontak. Coba lagi nanti ya! 🙏');
+    }
 };
 
-handler.command = handler.help = ['owner', 'creator', 'sponsor', 'botkontak']; // Tambah 'botkontak' di command
+handler.command = handler.help = ['owner', 'creator', 'sponsor', 'botkontak'];
 handler.tags = ['info'];
-handler.limit = false; 
+handler.limit = false;
 
 module.exports = handler;
