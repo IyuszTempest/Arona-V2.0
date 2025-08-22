@@ -1201,32 +1201,8 @@ module.exports = {
 		case 'leave':
 		case 'invite':
 		case 'invite_v4':
-                if (chat.welcome) {
-                    let groupMetadata = await this.groupMetadata(id) || (conn.chats[id] || {}).metadata
-                    for (let user of participants) {
-                        let pp = 'https://telegra.ph/file/70e8de9b1879568954f09.jpg'
-                        try {
-                             pp = await this.profilePictureUrl(user, 'image')
-                        } catch (e) {
-                        } finally {
-                        text = (action === 'add' ? (chat.sWelcome || this.welcome || conn.welcome || 'Welcome, @user!').replace('@subject', await this.getName(id)).replace('@desc', groupMetadata.desc ? groupMetadata.desc.toString() : '') :
-                         (chat.sBye || this.bye || conn.bye || 'Bye, @user!')).replace('@user', '@' + user.split('@')[0])
-                            await this.sendMessage(id, { text: text, contextInfo: { mentionedJid: [user] }}, { quoted: null })
-			    /**this.sendMessage(id, {
-                            text: text,
-                            contextInfo: {
-			    mentionedJid: [user],
-                            externalAdReply: {  
-                            title: action === 'add' ? 'Selamat Datang' : 'Selamat tinggal',
-                            body: global.wm,
-                            thumbnailUrl: pp,
-                            sourceUrl: 'https://api.botcahx.eu.org',
-                            mediaType: 1,
-                            renderLargerThumbnail: true 
-                            }}}, { quoted: null })**/
-                        }
-                    }
-		}
+                // Logic ini di-handle oleh plugins/group-event-welcomebye.js untuk menghindari pesan ganda.
+                // Jika ingin mengaktifkan kembali, hapus atau comment file plugins/group-event-welcomebye.js
                 break                    
             case 'promote':
                 text = (chat.sPromote || this.spromote || conn.spromote || '@user ```is now Admin```')
