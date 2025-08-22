@@ -38,7 +38,7 @@ handler.before = async (m, { conn, isBotAdmin }) => {
 
     if (isBotAdmin) {
         await conn.groupParticipantsUpdate(m.chat, [m.sender], "remove")
-        await conn.sendMessage(m.chat, { text: @${senderNumber} telah dikeluarkan karena terdeteksi bot., mentions: [m.sender] })
+        await conn.sendMessage(m.chat, { text: `@${senderNumber} telah dikeluarkan karena terdeteksi bot.`, mentions: [m.sender] })
     } else {
         await conn.sendMessage(m.chat, { delete: m.key })
     }
