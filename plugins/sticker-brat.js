@@ -40,7 +40,7 @@ let handler = async (m, {
     
     await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
 
-    const apiUrl = `https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(text.substring(0, 151))}`;
+    const apiUrl = `https://api.zenzxz.my.id/maker/brat?text=${encodeURIComponent(text.substring(0, 151))}`;
     
     try {
         var stiker = await sticker5(apiUrl, { packname });
