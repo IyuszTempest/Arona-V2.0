@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { uploadImage } = require('../lib/uploader.js');
+const uploadImage = require('../lib/uploadImage.js'); 
 
 let handler = async (m, { conn, usedPrefix, command }) => {
     const fkontak = {
@@ -11,7 +11,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
             }
         },
         participant: "0@s.whatsapp.net"
@@ -20,32 +20,32 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const quoted = m.quoted ? m.quoted : m;
     const mime = (quoted.msg || quoted).mimetype || '';
 
-    if (!/image/.test(mime)) {
-        return conn.reply(m.chat, `Reply gambar yang mau dibikin HD.\n\nContoh: Reply gambar lalu ketik *${usedPrefix + command}*`, fkontak);
+    if (!/image/.test(mime) || /webp/.test(mime)) {
+        return conn.reply(m.chat, Reply gambar yang mau di remini.\n\nContoh: Reply gambar lalu ketik *${usedPrefix + command}*, fkontak);
     }
 
     try {
-        await conn.reply(m.chat, 'Sabar, lagi proses bikin gambarnya jadi HD...', fkontak);
+        await conn.reply(m.chat, 'Sabar uy...', fkontak);
 
         const imgBuffer = await quoted.download();
+        const imgUrl = await uploadImage(imgBuffer); 
 
-        const imgUrl = await uploadImage(imgBuffer);
         if (!imgUrl) {
-            throw new Error("Gagal mengupload gambar.");
+            throw new Error("Gagal mengupload gambar ke server sementara.");
         }
 
-        const response = await axios.get(`https://api.zenzxz.my.id/tools/remini?url=${encodeURIComponent(imgUrl)}`);
+        const response = await axios.get(https://api.zenzxz.my.id/tools/remini?url=${encodeURIComponent(imgUrl)});
         const resultUrl = response.data.result.result_url;
 
         if (!resultUrl) {
-            throw new Error("API tidak mengembalikan hasil.");
+            throw new Error("API tidak mengembalikan hasil gambar.");
         }
 
         await conn.sendFile(
             m.chat,
             resultUrl,
             'remini_result.jpg',
-            `Nih, gambarnya udah jadi HD! ✨`,
+            'Nih, gambarnya! ✨',
             fkontak
         );
 
@@ -58,6 +58,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 handler.help = ['remini'];
 handler.tags = ['tools'];
 handler.command = ['remini'];
-handler.limit = true; 
+handler.limit = true;
 
 module.exports = handler;
