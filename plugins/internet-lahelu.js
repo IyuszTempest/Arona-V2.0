@@ -26,7 +26,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
             }
         },
         participant: "0@s.whatsapp.net"
@@ -35,10 +35,10 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
         await conn.reply(m.chat, global.wait, fkontak);
 
-        const apiUrl = `https://iyusztempest.my.id/api/fun/lahelu`;
+        const apiUrl = https://iyusztempest.my.id/api/fun/lahelu;
         
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+        if (!response.ok) throw new Error(API error: ${response.statusText});
         
         const data = await response.json();
         
@@ -47,20 +47,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         }
 
         const mediaUrl = data.media.url;
+        const judul = data.message;
         const mediaType = getMediaType(mediaUrl);
 
         if (mediaType === 'image') {
             await conn.sendMessage(m.chat, {
                 image: { url: mediaUrl },
-                caption: 'Nih, meme random buat lu 🗿'
+                caption: judul,
             }, { quoted: fkontak });
         } else if (mediaType === 'video') {
             await conn.sendMessage(m.chat, {
                 video: { url: mediaUrl },
-                caption: 'Nih, meme random buat lu 🗿'
+                caption: judul,
             }, { quoted: fkontak });
         } else {
-            return conn.reply(m.chat, `Tipe media tidak dikenali: ${mediaUrl}`, fkontak);
+            return conn.reply(m.chat, Tipe media tidak dikenali: ${mediaUrl}, fkontak);
         }
         
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
