@@ -11,7 +11,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
+                // --- DIPERBAIKI 1 ---
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
             }
         },
         participant: "0@s.whatsapp.net"
@@ -21,11 +22,12 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const mime = (quoted.msg || quoted).mimetype || '';
 
     if (!/image/.test(mime) || /webp/.test(mime)) {
-        return conn.reply(m.chat, Reply gambar yang mau di remini.\n\nContoh: Reply gambar lalu ketik *${usedPrefix + command}*, fkontak);
+        // --- DIPERBAIKI 2 ---
+        return conn.reply(m.chat, `Reply gambar yang mau di remini (bukan stiker/webp).\n\nContoh: Reply gambar lalu ketik *${usedPrefix + command}*`, fkontak);
     }
 
     try {
-        await conn.reply(m.chat, 'Sabar uy...', fkontak);
+        await conn.reply(m.chat, 'Sabar uy, lagi diproses...', fkontak);
 
         const imgBuffer = await quoted.download();
         const imgUrl = await uploadImage(imgBuffer); 
@@ -34,7 +36,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
             throw new Error("Gagal mengupload gambar ke server sementara.");
         }
 
-        const response = await axios.get(https://api.zenzxz.my.id/tools/remini?url=${encodeURIComponent(imgUrl)});
+        // --- DIPERBAIKI 3 ---
+        const response = await axios.get(`https://api.zenzxz.my.id/tools/remini?url=${encodeURIComponent(imgUrl)}`);
         const resultUrl = response.data.result.result_url;
 
         if (!resultUrl) {
