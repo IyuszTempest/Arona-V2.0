@@ -1,4 +1,5 @@
-/*Plugins CJS 
+/*
+Plugins CJS 
 Random Lahelu 
 By IyuszTempest
 https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635
@@ -17,6 +18,7 @@ function getMediaType(url) {
 }
 
 let handler = async (m, { conn, usedPrefix, command }) => {
+    // --- BAGIAN YANG DIPERBAIKI ---
     const fkontak = {
         key: {
             participants: "0@s.whatsapp.net",
@@ -26,6 +28,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
+                // vcard sekarang dibungkus dengan backtick (`)
                 vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
             }
         },
@@ -35,9 +38,11 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
         await conn.reply(m.chat, global.wait, fkontak);
 
-        const apiUrl = https://iyusztempest.my.id/api/fun/lahelu;
+        // URL API sekarang dibungkus dengan tanda kutip (')
+        const apiUrl = 'https://iyusztempest.my.id/api/fun/lahelu';
         
         const response = await fetch(apiUrl);
+        // Pesan Error sekarang dibungkus dengan backtick (`)
         if (!response.ok) throw new Error(API error: ${response.statusText});
         
         const data = await response.json();
@@ -61,6 +66,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
                 caption: judul,
             }, { quoted: fkontak });
         } else {
+            // Pesan Reply sekarang dibungkus dengan backtick (`)
             return conn.reply(m.chat, Tipe media tidak dikenali: ${mediaUrl}, fkontak);
         }
         
