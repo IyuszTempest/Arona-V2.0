@@ -51,8 +51,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                   externalAdReply: {
                       title: "Pesan Broadcast",
                       body: "Penting! Harap diperhatikan.",
-                      thumbnailUrl: "https://files.catbox.moe/ilj34e.jpg", // Atau thumbnail bot lo
-                      sourceUrl: "https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c", // Link channel lo
+                      thumbnailUrl: global.bcgc, // Atau thumbnail bot lo
+                      sourceUrl: global.gc, // Link channel lo
                       mediaType: 1
                   }
               }
