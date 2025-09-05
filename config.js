@@ -30,7 +30,8 @@ global.gambarsewa1 = 'https://files.catbox.moe/ml8yts.jpg' //dari plugins info-s
 global.gambarsewa2 = 'https://files.catbox.moe/t0a7im.jpg'
 global.gambarsewa3 = 'https://files.catbox.moe/ftgesl.jpg'
 global.gambarsewa4 = 'https://files.catbox.moe/yl9k3i.jpg'
-global.fallbackthumb = 'https://files.catbox.moe/lmzwvb.jpg'
+global.fallbackthumb = 'https://file.idnet.my.id/api/preview.php?file=kg62lb3n.jpg'
+global.bcgc = 'https://file.idnet.my.id/api/preview.php?file=kg62lb3n.jpg'
 
 
 //#Settings Loading
