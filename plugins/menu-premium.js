@@ -92,7 +92,7 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
                 mentionedJid: [m.sender],
                 externalAdReply: {
                     title: "👑 Menu Khusus Premium 👑",
-                    body: "Fitur Eksklusif Untuk Anda!",
+                    body: "Fitur Eksklusif Untuk Kamu!",
                     mediaType: 1, 
                     previewType: "IMAGE",
                     renderLargerThumbnail: true,
@@ -121,7 +121,7 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
 handler.help = ['menupremium', 'premiummenu'];
 handler.tags = ['premium'];
 handler.command = /^(menupremium|premiummenu)$/i;
-handler.premium = true;
+handler.premium = false;
 handler.exp = 3;
 
 module.exports = handler;
