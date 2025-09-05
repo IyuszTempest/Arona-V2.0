@@ -21,7 +21,7 @@ const handler = async (m, { text, command, prefix, conn }) => { // Pastikan 'con
     };
 
     // === URL gambar yang lo kasih, Yus ===
-    const customImageUrl = 'https://telegra.ph/file/a6a4fa97a0c0044b89a7b.jpg'; 
+    const customImageUrl = 'https://files.catbox.moe/mctz2j.jpg'; 
     // ===================================
 
     try {
