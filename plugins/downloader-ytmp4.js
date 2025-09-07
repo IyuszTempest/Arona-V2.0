@@ -139,9 +139,9 @@ mentions: [m.sender]
 m.reply("❌ *Terjadi kesalahan saat mengambil data.*");
 }
 }
-handler.command = /^(ytv)$/i;
+handler.command = /^(ytmp4)$/i;
 handler.help = ["ytmp4 *<url>* *[resolusi]*"];
-handler.tags = ["downloader","premium"];
+handler.tags = ["downloader"];
 handler.limit = true;
-handler.premium = true;
+handler.premium = false;
 module.exports = handler;
