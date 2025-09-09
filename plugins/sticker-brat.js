@@ -8,7 +8,7 @@ let handler = async (m, { conn, text }) => {
   try {
     await m.reply('wait...')
 
-    const url = 'https://api.privatezia.biz.id/api/generator/brat?text=${encodeURIComponent(text)}'
+    const url = `https://api.privatezia.biz.id/api/generator/brat?text=${encodeURIComponent(text)}`
 
     const res = await fetch(url)
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
