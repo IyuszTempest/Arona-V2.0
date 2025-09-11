@@ -17,7 +17,7 @@ let handler = async (m, { conn }) => {
     let q = m.quoted ? m.quoted : m
     const mime = q.mimetype || ''
     if (!/image/.test(mime)) {
-      return m.reply('Kirim atau reply gambar dengan command: .tofigure / .buatfigure')
+      return m.reply('Kirim atau reply gambar dengan command: .tofigure2 / .buatfigure2')
     }
 
     // react dengan emoji random
@@ -26,7 +26,7 @@ let handler = async (m, { conn }) => {
     await conn.sendMessage(m.chat, { react: { text: randomEmoji, key: m.key }})
 
     const imageBuffer = await q.download()
-    if (!imageBuffer) return m.reply('Eror pas mengunduh gambar')
+    if (!imageBuffer) return m.reply('Eror pas mengunduh gambar, coba lagi!')
 
     const ai = new GoogleGenAI({ apiKey: APIKEY })
     const base64Image = imageBuffer.toString('base64')
@@ -51,11 +51,11 @@ let handler = async (m, { conn }) => {
     for (const part of parts) {
       if (part.inlineData?.data) {
         const buffer = Buffer.from(part.inlineData.data, 'base64')
-        await conn.sendFile(m.chat, buffer, 'figure.png', 'Nih hasil jadi figurenya 🗿', m)
+        await conn.sendFile(m.chat, buffer, 'figure.png', 'Nih, figurenya 🤭', m)
       }
     }
   } catch (e) {
-    m.reply(`Eror kak : ${e.message}`)
+    m.reply(`Eror kak, coba pake .tofigure aja!! : ${e.message}`)
   }
 }
 
