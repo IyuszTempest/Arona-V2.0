@@ -59,9 +59,9 @@ let handler = async (m, { conn }) => {
   }
 }
 
-handler.help = ['tofigure', 'buatfigure']
+handler.help = ['tofigure2', 'buatfigure2']
 handler.tags = ['ai', 'premium']
-handler.command = /^(tofigure|buatfigure)$/i 
+handler.command = /^(tofigure2|buatfigure2)$/i 
 handler.premium = true
 
 module.exports = handler
