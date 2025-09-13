@@ -24,7 +24,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
         await conn.reply(m.chat, global.wait, fkontak);
 
-        const apiUrl = `https://iyusztempest.my.id/api/anime/wangy`;
+        const apiUrl = `https://iyusztempest.my.id/api/anime?feature=wangy`;
         
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`API error: ${response.statusText}`);
