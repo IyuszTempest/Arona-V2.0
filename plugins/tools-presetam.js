@@ -19,7 +19,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
         await conn.reply(m.chat, global.wait || 'Sabar, lagi nyari preset...', fkontak);
 
-        const { data } = await axios.get('https://iyusztempest.my.id/api/tools/presetam');
+        const { data } = await axios.get('https://iyusztempest.my.id/api/tools?feature=presetam');
 
         if (data.status !== 'success' || !data.media?.text) {
             throw new Error('Format API tidak valid atau tidak ada data preset.');
