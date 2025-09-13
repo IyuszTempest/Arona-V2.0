@@ -1,9 +1,8 @@
 const fetch = require('node-fetch');
-const { proto, generateWAMessageFromContent, prepareWAMessageMedia } = require("@adiwajshing/baileys"); // Import Baileys untuk carousel
-const axios = require('axios'); // Tambahkan axios untuk download buffer gambar
+const { proto, generateWAMessageFromContent, prepareWAMessageMedia } = require("@adiwajshing/baileys");
+const axios = require('axios');
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
-    // Definisi fkontak di sini untuk plugin ini
     const fkontak = {
         key: {
             participants: "0@s.whatsapp.net",
@@ -25,7 +24,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
     // Validasi link Instagram
     if (!args[0].includes('instagram.com') && !args[0].includes('instagr.am')) {
-        return conn.reply(m.chat, 'Link yang kamu berikan bukan link Instagram yang valid, masbro.', fkontak);
+        return conn.reply(m.chat, 'Link yang lu berikan bukan link Instagram yang valid woy', fkontak);
     }
 
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } }); // Reaksi menunggu
@@ -35,7 +34,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         const res = await api.json();
 
         if (!res.status) {
-            throw new Error(res.message || 'Error kak, ga bisa ngambil datanya dari Instagram.');
+            throw new Error(res.message || 'Error nih, ga bisa ngambil datanya dari Instagram.');
         }
 
         const profile = res.result.response.profile;
