@@ -15,7 +15,7 @@ Arona MD adalah bot WhatsApp berbasis Node.js yang dirancang untuk mempermudah b
 -   ✅ **Setengahnya menggunakan Scraper dan Rest Api, sisanya Apikey**
 -   ✅ **Type Plugins CJS**
 -   ✅ **Sudah ada lid**
-
+-   ✨ **Beberapa fitur menggunakan rest api pribadi (Euphy API by IyuszTempest)**
 
 ![Arona](https://files.catbox.moe/mskrgn.png)
 
