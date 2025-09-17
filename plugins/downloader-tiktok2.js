@@ -41,12 +41,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['tiktok3'];
-handler.command = /^(tiktok3|tt3)$/i;
+handler.help = ['tiktok2'];
+handler.command = /^(tiktok2|tt2)$/i;
 handler.tags = ['downloader'];
 handler.limit = true;
 handler.group = false;
-handler.premium = false;
+handler.premium = true;
 handler.owner = false;
 handler.admin = false;
 handler.botAdmin = false;
