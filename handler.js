@@ -849,7 +849,7 @@ module.exports = {
                 mute: false,
                 listStr: {},
                 sWelcome: 'Hai, @user!\nSelamat datang di grup @subject\n\n@desc',
-                sBye: 'Selamat tinggal @user!',
+                sBye: 'Sayonara @user!',
                 sPromote: '',
                 sDemote: '',
                 delete: false, 
@@ -1084,11 +1084,11 @@ module.exports = {
                     if (xp > 200) m.reply('Ngecit -_-') // Hehehe
                     else m.exp += xp
                     if (!isPrems && plugin.limit && global.db.data.users[m.sender].limit < plugin.limit * 1) {
-                        this.reply(m.chat, `Limit anda habis, silahkan beli melalui *${usedPrefix}buy* atau beli di *${usedPrefix}shop*`, m)
+                        this.reply(m.chat, Limit lu dah habis, silahkan beli melalui *${usedPrefix}buy* atau beli di *${usedPrefix}shop*, m)
                         continue // Limit habis
                     }
                     if (plugin.level > _user.level) {
-                        this.reply(m.chat, `diperlukan level ${plugin.level} untuk menggunakan perintah ini. Level kamu ${_user.level}\m gunakan .levelup untuk menaikan level!`, m)
+                        this.reply(m.chat, diperlukan level ${plugin.level} untuk menggunakan fitur ini. Level lu ${_user.level}\m gunakan .levelup untuk menaikan level!, m)
                         continue // If the level has not been reached
                     }
                     let extra = {
@@ -1126,7 +1126,7 @@ module.exports = {
                             for (let jid of owner.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').filter(v => v != this.user.jid)) {
                                 let data = (await this.onWhatsApp(jid))[0] || {}
                                 if (data.exists)
-                                    m.reply(`*Plugin:* ${m.plugin}\n*Sender:* @${m.sender.split`@`[0]}\n*Chat:* ${m.chat}\n*Chat Name:* ${await this.getName(m.chat)}\n*Command:* ${usedPrefix}${command} ${args.join(' ')}\n\n\`\`\`${text}\`\`\``.trim(), data.jid, { mentions: [m.sender] })
+                                    m.reply(*Plugin:* ${m.plugin}\n*Sender:* @${m.sender.split@[0]}\n*Chat:* ${m.chat}\n*Chat Name:* ${await this.getName(m.chat)}\n*Command:* ${usedPrefix}${command} ${args.join(' ')}\n\n\\\${text}\\\``.trim(), data.jid, { mentions: [m.sender] })
                             }
                             m.reply(text)
                         }
@@ -1139,7 +1139,7 @@ module.exports = {
                                 console.error(e)
                             }
                         }
-                        if (m.limit) m.reply(+ m.limit + ' Limit terpakai')
+                        if (m.limit) m.reply(+ m.limit + ' Limit dipake')
                    }
                     break
                 }
@@ -1205,9 +1205,9 @@ module.exports = {
                 // Jika ingin mengaktifkan kembali, hapus atau comment file plugins/group-event-welcomebye.js
                 break                    
             case 'promote':
-                text = (chat.sPromote || this.spromote || conn.spromote || '@user ```is now Admin```')
+                text = (chat.sPromote || this.spromote || conn.spromote || '@user is now Admin')
             case 'demote':
-                if (!text) text = (chat.sDemote || this.sdemote || conn.sdemote || '@user ```is no longer Admin```')
+                if (!text) text = (chat.sDemote || this.sdemote || conn.sdemote || '@user is no longer Admin')
                 text = text.replace('@user', '@' + participants[0].split('@')[0])
                 if (chat.detect) this.sendMessage(id, text, {
                     contextInfo: {
@@ -1227,7 +1227,7 @@ module.exports = {
         await this.reply(msg.key.remoteJid, `
 Terdeteksi @${participant.split`@`[0]} telah menghapus pesan
 Untuk mematikan fitur ini, ketik
-*.enable delete*
+.enable delete
 `.trim(), msg, {
             mentions: [participant]
         })
@@ -1237,16 +1237,16 @@ Untuk mematikan fitur ini, ketik
 
 global.dfail = (type, m, conn) => {
     let msg = {
-        rowner: 'Perintah ini hanya dapat digunakan oleh _*OWWNER!1!1!*_',
-        owner: 'Perintah ini hanya dapat digunakan oleh _*Owner Bot*_!',
-        mods: 'Perintah ini hanya dapat digunakan oleh _*Moderator*_ !',
-        premium: 'Perintah ini hanya untuk member _*Premium*_ !',
-        group: 'Perintah ini hanya dapat digunakan di grup!',
-        private: 'Perintah ini hanya dapat digunakan di Chat Pribadi!',
-        admin: 'Perintah ini hanya untuk *Admin* grup!',
-        botAdmin: 'Jadikan bot sebagai *Admin* untuk menggunakan perintah ini!',
-        unreg: 'Silahkan daftar untuk menggunakan fitur ini dengan cara mengetik:\n\n*#daftar nama.umur*\n\nContoh: *#daftar Mansur.16*',
-        restrict: 'Fitur ini di *disable*!'
+        rowner: 'Lu bukan owner woy 😡',
+        owner: 'Lu bukan owner woy 🙄',
+        mods: 'Perintah ini hanya dapat digunakan oleh Moderator !',
+        premium: 'Lu belum beli premium, beli dulu sono! 😆',
+        group: 'Fitur ini cuma bisa dipake di grup ya! ✨',
+        private: 'Fitur ini sangat privasi, silahkan gunakan di pribadi chat dengan bijak 🤨',
+        admin: 'Lu admin, lu berkuasa. lu member bisa apa? :v',
+        botAdmin: Jadikan bot ${global.namebot} sebagai *Admin* untuk menggunakan fitur ini! 😁,
+        unreg: *Dibaca loh rek!!* Silahkan daftar dulu buat pakai bot ${global.namebot} dengan cara mengetik:\n\n*.daftar nama.umur*\n\nContoh: *.daftar Iyus.18*,
+        restrict: 'Fitur ini di matikan/disable!'
     }[type]
     if (msg) return m.reply(msg)
 }
