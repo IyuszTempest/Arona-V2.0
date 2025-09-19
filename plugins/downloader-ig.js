@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 const { proto, generateWAMessageFromContent, prepareWAMessageMedia } = require("@adiwajshing/baileys");
 const axios = require('axios');
 
@@ -12,147 +11,104 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
             }
         },
         participant: "0@s.whatsapp.net"
     };
 
     if (!args[0]) {
-        return conn.reply(m.chat, `*Contoh:* ${usedPrefix + command} https://www.instagram.com/p/ByxKbUSnubS/`, fkontak);
+        return conn.reply(m.chat, *Contoh:* ${usedPrefix + command} https://www.instagram.com/p/ByxKbUSnubS/, fkontak);
     }
-
-    // Validasi link Instagram
-    if (!args[0].includes('instagram.com') && !args[0].includes('instagr.am')) {
+    if (!args[0].includes('instagram.com')) {
         return conn.reply(m.chat, 'Link yang lu berikan bukan link Instagram yang valid woy', fkontak);
     }
 
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } }); // Reaksi menunggu
+    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
 
     try {
-        const api = await fetch(`https://api.vreden.my.id/api/igdownload?url=${encodeURIComponent(args[0])}`); // Encode URL
-        const res = await api.json();
+        // Menggunakan API dari IyuszTempest
+        const api = await axios.get(https://iyusztempest.my.id/api/downloader?feature=instagram&link=${encodeURIComponent(args[0])});
+        const res = api.data;
 
-        if (!res.status) {
-            throw new Error(res.message || 'Error nih, ga bisa ngambil datanya dari Instagram.');
+        if (res.status !== 'success' || !res.data) {
+            throw new Error(res.message || 'Gagal mengambil data dari Instagram.');
         }
 
-        const profile = res.result.response.profile;
-        const media = res.result.response.data;
+        const result = res.data;
+        const owner = result.owner;
+        const media = result.medias.filter(item => item.type === 'video' || item.type === 'image');
 
-        // --- Kirim Informasi Profil (tetap terpisah) ---
-        let profileMessage = `*Profile Information:*\n`;
-        profileMessage += `*🪪 Full Name:* ${profile.full_name || 'N/A'}\n`;
-        profileMessage += `*👤 Username:* ${profile.username || 'N/A'}\n`;
-        profileMessage += `*👥 Followers Count:* ${res.result.response.statistics.user_follower_count || 'N/A'}\n`;
-        profileMessage += `*📁 Media Count:* ${res.result.response.statistics.user_media_count || 'N/A'}\n`;
-        
-        // Coba kirim PP profile jika ada
-        if (profile.profile_pic_url) {
-            try {
-                const ppBuffer = (await axios.get(profile.profile_pic_url, { responseType: 'arraybuffer' })).data;
-                await conn.sendMessage(m.chat, { image: ppBuffer, caption: profileMessage }, { quoted: fkontak });
-            } catch (ppError) {
-                console.error("Gagal kirim PP Instagram profile:", ppError.message);
-                await conn.sendMessage(m.chat, { text: profileMessage }, { quoted: fkontak }); // Fallback ke teks
-            }
-        } else {
-            await conn.sendMessage(m.chat, { text: profileMessage }, { quoted: fkontak });
-        }
-        // --- Akhir Informasi Profil ---
-
-        if (!media || media.length === 0) {
-            throw new Error('Tidak ada media (gambar/video) ditemukan di post ini.');
-        }
-
-        // --- Logika Carousel untuk Media ---
-        if (media.length === 1) { // Jika hanya 1 media (misal Reel atau Single Post)
-            const mediaItem = media[0];
-            let messageCaption = `✅ *Instagram Media Ditemukan!*`;
-            messageCaption += `\n*Tipe:* ${mediaItem.type.toUpperCase()}\n`;
-            messageCaption += `*Link Asli:* ${args[0]}`;
-
-            await conn.reply(m.chat, `_Mengunduh ${mediaItem.type}, mohon tunggu..._`, fkontak); // Pesan proses unduh
-            const mediaBuffer = (await axios.get(mediaItem.url, { // Unduh media full quality
-                responseType: 'arraybuffer',
-                headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.instagram.com/' } 
-            })).data;
-
-            if (mediaItem.type === 'video') {
-                await conn.sendMessage(m.chat, { video: mediaBuffer, caption: messageCaption }, { quoted: fkontak });
-            } else if (mediaItem.type === 'image') {
-                await conn.sendMessage(m.chat, { image: mediaBuffer, caption: messageCaption }, { quoted: fkontak });
+        if (owner) {
+            let profileMessage = *Profil Instagram Ditemukan:*\n\n;
+            profileMessage += *🪪 Nama Lengkap:* ${owner.full_name || 'N/A'}\n;
+            profileMessage += *👤 Username:* ${owner.username || 'N/A'}\n;
+            
+            if (owner.profile_pic_url) {
+                await conn.sendButton(m.chat, profileMessage, 'Instagram Profile', owner.profile_pic_url, [['Kunjungi Profil', https://instagram.com/${owner.username}]], fkontak);
             } else {
-                await conn.reply(m.chat, `Tipe media tidak dikenali untuk post tunggal: ${mediaItem.type}`, fkontak);
+                 await conn.reply(m.chat, profileMessage, fkontak);
             }
-        } else { // Jika ada banyak media (carousel/slide)
+        }
+        
+        if (!media || media.length === 0) {
+            throw new Error('Tidak ada media (gambar/video) yang bisa diunduh dari post ini.');
+        }
+
+        if (media.length === 1) {
+            const mediaItem = media[0];
+            let messageCaption = ✅ *Instagram Downloader*\n\n;
+            messageCaption += *Judul:* ${result.title || 'Tanpa Judul'}\n;
+            messageCaption += *Tipe:* ${mediaItem.type.toUpperCase()};
+            
+            await conn.reply(m.chat, _Mengunduh ${mediaItem.type}, mohon tunggu..._, fkontak);
+            
+            if (mediaItem.type === 'video') {
+                await conn.sendMessage(m.chat, { video: { url: mediaItem.url }, caption: messageCaption }, { quoted: fkontak });
+            } else if (mediaItem.type === 'image') {
+                await conn.sendMessage(m.chat, { image: { url: mediaItem.url }, caption: messageCaption }, { quoted: fkontak });
+            }
+
+        } else { 
             const carouselCards = [];
-            const maxCarouselCards = Math.min(media.length, 10); // Batasi maksimal 10 kartu
+            await conn.reply(m.chat, Ditemukan ${media.length} media. Membuat tampilan carousel..., fkontak);
 
-            for (let i = 0; i < maxCarouselCards; i++) {
+            for (let i = 0; i < Math.min(media.length, 10); i++) {
                 const mediaItem = media[i];
-                let cardImageUrl = mediaItem.thumb; // Gunakan thumbnail untuk header carousel
-                let isVideoCard = mediaItem.type === 'video';
-                
+                const cardImageUrl = mediaItem.thumbnail || result.thumbnail; 
+
                 try {
-                    const mediaBuffer = (await axios.get(cardImageUrl, { // Unduh thumbnail ke buffer
-                        responseType: 'arraybuffer',
-                        headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            'Referer': 'https://www.instagram.com/' 
-                        }
-                    })).data;
-
-                    const imageMedia = await prepareWAMessageMedia({ image: mediaBuffer }, { upload: conn.waUploadToServer });
-
-                    carouselCards.push({
-                        body: proto.Message.InteractiveMessage.Body.fromObject({
-                            text: `✨ *Item #${i + 1}*\n\nJenis: ${mediaItem.type.toUpperCase()}`
-                        }),
-                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                            text: `Dari Instagram Post`
-                        }),
+                    const mediaBuffer = (await axios.get(cardImageUrl, { responseType: 'arraybuffer' })).data;
+                    const imageMessage = (await prepareWAMessageMedia({ image: mediaBuffer }, { upload: conn.waUploadToServer })).imageMessage;
+                    
+                    const card = {
+                        body: proto.Message.InteractiveMessage.Body.fromObject({ text: ✨ *Item #${i + 1}* | Tipe: ${mediaItem.type.toUpperCase()} }),
+                        footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: Username: @${owner.username} }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: `Instagram Item ${i + 1}/${media.length}`,
-                            subtitle: `Tipe: ${mediaItem.type.toUpperCase()}`,
+                            title: Instagram Post Slide,
+                            subtitle: result.title || 'Geser untuk melihat',
                             hasMediaAttachment: true,
-                            imageMessage: imageMedia.imageMessage
+                            imageMessage: imageMessage
                         }),
                         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                            buttons: [
-                                {
-                                    name: "cta_url",
-                                    buttonParamsJson: `{"display_text":"${isVideoCard ? 'Lihat Video' : 'Lihat Gambar'}","url":"${mediaItem.url}"}` // Link ke media asli
-                                },
-                                {
-                                    name: "cta_url",
-                                    buttonParamsJson: `{"display_text":"Kunjungi Post","url":"${args[0]}"}` // Link ke post asli
-                                }
-                            ]
+                            buttons: [{
+                                name: "cta_url",
+                                buttonParamsJson: JSON.stringify({ display_text: Unduh Media #${i+1}, url: mediaItem.url })
+                            }]
                         })
-                    });
-                } catch (cardError) {
-                    console.error(`Gagal memproses item carousel ke-${i + 1} (${cardImageUrl}):`, cardError);
-                    if (cardError.response) {
-                        console.error(`  Status: ${cardError.response.status}, Data: ${cardError.response.data.toString()}`);
-                    }
+                    };
+                    carouselCards.push(card);
+                } catch (e) {
+                    console.error(Gagal memproses item carousel ke-${i+1}:, e);
                 }
             }
 
             if (carouselCards.length > 0) {
-                const userName = m.pushName || "Masbro";
                 const carouselMessage = generateWAMessageFromContent(m.chat, {
                     interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-                        body: proto.Message.InteractiveMessage.Body.create({
-                            text: `*${userName}!* Ini carousel Instagram dari link kamu:`
-                        }),
-                        footer: proto.Message.InteractiveMessage.Footer.create({
-                            text: "Geser aja buat liat semua item! 😎"
-                        }),
-                        header: proto.Message.InteractiveMessage.Header.create({
-                            title: `📸 *Instagram Carousel*`,
-                            hasMediaAttachment: false
-                        }),
+                        body: proto.Message.InteractiveMessage.Body.create({ text: *Hai, ${m.pushName}!* Post ini berisi ${media.length} media. }),
+                        footer: proto.Message.InteractiveMessage.Footer.create({ text: "Geser kartu untuk melihat semua media ➡" }),
+                        header: proto.Message.InteractiveMessage.Header.create({ title: 📸 Instagram Downloader, hasMediaAttachment: false }),
                         carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
                             cards: carouselCards,
                             messageVersion: 1
@@ -162,26 +118,23 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
                 await conn.relayMessage(m.chat, carouselMessage.message, { messageId: carouselMessage.key.id });
             } else {
-                await conn.reply(m.chat, `Gagal menampilkan semua item dari post Instagram ini.`, fkontak);
+                await conn.reply(m.chat, 'Gagal membuat tampilan carousel, mengirim media satu per satu...', fkontak);
+                for (const mediaItem of media) {
+                    await conn.sendFile(m.chat, mediaItem.url, '', *Instagram Downloader - ${mediaItem.type}*, fkontak);
+                }
             }
         }
-        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
     } catch (e) {
-        console.error('Error di plugin Instagram Downloader (Vreden.my.id):', e);
+        console.error('Error di plugin Instagram Downloader:', e);
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, `Terjadi kesalahan saat mendownload Instagram: ${e.message || 'Tidak diketahui'}. Pastikan link valid dan didukung.`, fkontak);
+        conn.reply(m.chat, Terjadi kesalahan: ${e.message || 'Tidak diketahui'}. Pastikan link valid dan publik., fkontak);
     }
 }
 
 handler.help = ['instagram <link>'];
 handler.tags = ['downloader'];
-handler.command = /^(ig|instagram)$/i;
+handler.command = ['ig', 'instagram'];
 handler.limit = true;
 
 module.exports = handler;
-
-// Fungsi sleep tidak dipakai di sini, bisa dihapus jika tidak digunakan di bagian lain
-// function sleep(ms) {
-//     return new Promise(resolve => setTimeout(resolve, ms));
-// }
