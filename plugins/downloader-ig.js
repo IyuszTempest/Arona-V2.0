@@ -27,7 +27,6 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
 
     try {
-        // Menggunakan API dari IyuszTempest
         const api = await axios.get(https://iyusztempest.my.id/api/downloader?feature=instagram&link=${encodeURIComponent(args[0])});
         const res = api.data;
 
@@ -43,11 +42,8 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
             let profileMessage = *Profil Instagram Ditemukan:*\n\n;
             profileMessage += *🪪 Nama Lengkap:* ${owner.full_name || 'N/A'}\n;
             profileMessage += *👤 Username:* ${owner.username || 'N/A'}\n;
-            
             if (owner.profile_pic_url) {
-                await conn.sendButton(m.chat, profileMessage, 'Instagram Profile', owner.profile_pic_url, [['Kunjungi Profil', https://instagram.com/${owner.username}]], fkontak);
-            } else {
-                 await conn.reply(m.chat, profileMessage, fkontak);
+                await conn.reply(m.chat, profileMessage, fkontak);
             }
         }
         
@@ -57,31 +53,24 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
         if (media.length === 1) {
             const mediaItem = media[0];
-            let messageCaption = ✅ *Instagram Downloader*\n\n;
-            messageCaption += *Judul:* ${result.title || 'Tanpa Judul'}\n;
-            messageCaption += *Tipe:* ${mediaItem.type.toUpperCase()};
-            
+            let messageCaption = ✅ *Instagram Downloader*\n\n*Judul:* ${result.title || 'Tanpa Judul'}\n*Tipe:* ${mediaItem.type.toUpperCase()};
             await conn.reply(m.chat, _Mengunduh ${mediaItem.type}, mohon tunggu..._, fkontak);
-            
             if (mediaItem.type === 'video') {
                 await conn.sendMessage(m.chat, { video: { url: mediaItem.url }, caption: messageCaption }, { quoted: fkontak });
             } else if (mediaItem.type === 'image') {
                 await conn.sendMessage(m.chat, { image: { url: mediaItem.url }, caption: messageCaption }, { quoted: fkontak });
             }
-
-        } else { 
-            const carouselCards = [];
+        } else {
             await conn.reply(m.chat, Ditemukan ${media.length} media. Membuat tampilan carousel..., fkontak);
 
-            for (let i = 0; i < Math.min(media.length, 10); i++) {
-                const mediaItem = media[i];
-                const cardImageUrl = mediaItem.thumbnail || result.thumbnail; 
-
+            // --- LOGIKA CAROUSEL DIPERBAIKI TOTAL DENGAN PROMISE.ALL ---
+            const cardPromises = media.slice(0, 10).map(async (mediaItem, i) => {
+                let cardImageUrl = (mediaItem.type === 'image') ? mediaItem.url : (mediaItem.thumbnail || result.thumbnail);
                 try {
                     const mediaBuffer = (await axios.get(cardImageUrl, { responseType: 'arraybuffer' })).data;
                     const imageMessage = (await prepareWAMessageMedia({ image: mediaBuffer }, { upload: conn.waUploadToServer })).imageMessage;
                     
-                    const card = {
+                    return { // Langsung return object card yang sudah jadi
                         body: proto.Message.InteractiveMessage.Body.fromObject({ text: ✨ *Item #${i + 1}* | Tipe: ${mediaItem.type.toUpperCase()} }),
                         footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: Username: @${owner.username} }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
@@ -97,11 +86,15 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                             }]
                         })
                     };
-                    carouselCards.push(card);
                 } catch (e) {
                     console.error(Gagal memproses item carousel ke-${i+1}:, e);
+                    return null; // Kembalikan null jika item ini gagal diproses
                 }
-            }
+            });
+
+            // Jalankan semua promise secara paralel dan filter hasil yang gagal (null)
+            const carouselCards = (await Promise.all(cardPromises)).filter(card => card !== null);
+            // --- AKHIR PERBAIKAN ---
 
             if (carouselCards.length > 0) {
                 const carouselMessage = generateWAMessageFromContent(m.chat, {
