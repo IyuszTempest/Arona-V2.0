@@ -86,7 +86,7 @@ let handler = async (m, { conn, args }) => {
             audio: { url: audio.url },
             mimetype: audio.mimeType || 'audio/mp4',
             fileName: `${downloadResult.title || 'audio'}.${audio.ext || 'mp3'}`,
-            ptt: true,
+            ptt: false,
             contextInfo: {
                 externalAdReply: {
                     title: downloadResult.title || 'Downloaded Audio',
