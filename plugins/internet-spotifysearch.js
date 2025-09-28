@@ -1,19 +1,20 @@
-/*PLUGINS CJS 
-Spotify Search Fix, code sebelumnya error
-*Sumber:* _https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635_
+/*
+PLUGINS CJS 
+Spotify Search
+https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635
 */
 
 const axios = require('axios');
 
 async function searchSpotify(query) {
-    const apiUrl = `https://api.siputzx.my.id/api/s/spotify?query=${encodeURIComponent(query)}`;
+    const apiUrl = `https://ytdlpyton.nvlgroup.my.id/spotify/search?query=${encodeURIComponent(query)}`;
     const { data } = await axios.get(apiUrl);
     
-    if (!data.status || !data.data || data.data.length === 0) {
-        throw new Error('Tidak ada hasil yang ditemukan dari API search.');
+    if (!data.results || data.results.length === 0) {
+        throw new Error(`Tidak ada hasil yang ditemukan untuk "${query}".`);
     }
     
-    return data.data;
+    return data.results;
 }
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
@@ -26,7 +27,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Bot;;;\nFN:Bot\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
             }
         },
         participant: "0@s.whatsapp.net"
@@ -34,21 +35,20 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
     try {
         if (!args[0]) {
-            return conn.reply(m.chat, `Mau cari lagu apa, masbro?\n\n*Contoh:* *${usedPrefix + command}* on the way aina`, fkontak);
+            return conn.reply(m.chat, `Mau cari lagu apa,\n\n*Contoh:* *${usedPrefix + command}* gradation hanatan`, fkontak);
         }
 
         const query = args.join(' ');
-        await conn.reply(m.chat, `Sedang mencari lagu "${query}" di Spotify...`, fkontak);
+        await conn.reply(m.chat, `Sedang mencari lagu "${query}" di Spotify... ⏳`, fkontak);
 
         const results = await searchSpotify(query);
 
-        let resultText = `*Hasil Pencarian Spotify untuk "${query}"*\n\n`;
+        let resultText = `*✅ Hasil Pencarian Spotify untuk "${query}"*\n\n`;
         
         results.slice(0, 5).forEach((item, index) => {
             resultText += `*${index + 1}.* *${item.title}*\n` +
-                          `_✨ Artis:_ ${item.artist}\n` +
-                          `_⏰ Durasi:_ ${item.duration}\n` +
-                          `_🔗 Link:_ ${item.track_url}\n\n`;
+                          `  ✨ *Artis:* ${item.artist}\n` +
+                          `  🔗 *Link:* ${item.spotify_url}\n\n`;
         });
 
         await conn.reply(m.chat, resultText.trim(), fkontak);
