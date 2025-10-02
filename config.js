@@ -3,6 +3,13 @@ global.owner = ['6282255810534','6285245307548','12773870301387','18106728160463
 global.mods = ['6282255810534','12773870301387','181067281604634'] //lid nya jangan lupa
 global.prems = ['6282255810534','6285245307548','12773870301387','181067281604634'] //jangan lupa lid nya mas
 global.nameowner = 'IyuszTempest' //owner utama
+global.umurowner = '18 Tahun'
+global.genderowner = 'Laki-laki'
+global.agamaowner = 'Kristen'
+global.gamefav = 'Genshin Impact, Free Fire, PUBG Mobile'
+global.animefav = 'Dr Stone, Tenten Kakumei'
+global.waifuowner = 'Elaina'
+global.hobiowner = 'Nonton anime dan Ngoding Tipis tipis'
 global.namebot = 'Arona AI Multidevice' //nama bot lu
 global.namecreator = 'IyuszTempest' //kalau ga ada jangan diubah ntar error
 global.namesponsor = 'Alfat.syah' //kalau ga ada jangan diubah ntar error
@@ -15,12 +22,19 @@ global.mail = 'aronamail@desu' //bebas mau kek mana, jangan dikosongin
 global.mailowmer = 'iyusztempest@gmail.com' //wajib masukin, ini juga termasuk akun mega lu
 global.mailcreator = 'thecreator@mail.co.id' //biarin aja jangan diubah
 global.mailsponsor = 'thesponsor@mail.com' //biarin aja jangan diubah
-global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau ch atau gc
-global.instagramowner = 'https://www.instagram.com/iyusz_tempest?igsh=MWdoemNtdmoxdTBzbA==' //wajib
-global.websiteowner = 'https://linkbio.iyusztempest.biz.id' //kalau ga ada ya biarin aja biar ga error
 global.wm = '© Arona Bot Multidevice' //wm bot
 global.wm2 = 'By IyuszTempest'
 global.pwmega = 'passwordmegalu' //ini password akun mega lu, buat plugin up mega)
+
+
+//#Media Sosial Owner
+global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau ch atau gc
+global.instagramowner = 'https://www.instagram.com/iyusz_tempest?igsh=MWdoemNtdmoxdTBzbA==' //wajib
+global.websiteowner = 'https://iyusztempest.my.id' //kalau ga ada ya biarin aja biar ga error
+global.pinterestowner = 'https://pin.it/ZJ73l4SqA'
+global.facebookowner = 'https://www.facebook.com/Iyusz.nime?mibextid=ZbWKwL'
+global.youtubeowner = 'https://youtube.com/@iyz_ftagm?si=VRWuxEgvkK-24ks7'
+global.githubowner = 'https://github.com/IyuszTempest'
 
 
 
@@ -32,6 +46,8 @@ global.gambarsewa3 = 'https://files.catbox.moe/ftgesl.jpg'
 global.gambarsewa4 = 'https://files.catbox.moe/yl9k3i.jpg'
 global.fallbackthumb = 'https://file.idnet.my.id/api/preview.php?file=kg62lb3n.jpg'
 global.bcgc = 'https://file.idnet.my.id/api/preview.php?file=kg62lb3n.jpg'
+global.mediabiodata = 'https://files.catbox.moe/4gptni.jpg'
+
 
 
 //#Settings Loading
