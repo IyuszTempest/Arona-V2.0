@@ -1,71 +1,97 @@
-/*`UPDATE NIH, SEKARANG GEMINI AI & VISION UDAH BISA SUPPORT SESI + RESET SESI + TRANSKRIP AUDIO ATAU MENGENALI AUDIO + MEMBACA DOKUMEN + MELIHAT IMAGE`
-`Note : sesi bakal di simpan di ram, jadi harap bijak menggunakan nya ya! tapi untuk dokumen dan image/video, dan sound, itu langsung di simpan ke google nya langsung!`
-weem :
-https://whatsapp.com/channel/0029Vb9ZfML6GcGFm9aPgh0W */
-
-// Dapatin API : https://ai.google.dev/gemini-api/docs?hl=id
 const uploadImage = require("../lib/uploadFile");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 const fs = require('fs');
 const path = require('path');
 const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const fetch = require('node-fetch');
 
-// Pastikan API Key lo valid dan aman di-handle
-const genAI = new GoogleGenerativeAI(global.geminiai); // Ganti dengan API Key lo yang sebenarnya
-
-const systemPrompt = "Tolong gunakan bahasa informal ya brosis🗿.";
+const genAI = new GoogleGenerativeAI(global.geminiai);
+const systemPrompt = "Tolong gunakan bahasa informal ya bro, keluarin jurus wibu lu 🗿, lu sering kali sedikit toxic karna permintaan user nyeleneh. Dan kemampuan lu adalah membaca gambar, dan mendeskripsikan audio dan mendengar nya, dan mentranskrip audio nya, file yang di dukung adalah WAV, MP3, AIFF, AAC, OGG, FLAC, dan kamu juga bisa membaca dokumen, dan tipe file nya adalah PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, RTF. lu juga bisa melakukan pencarian real-time di internet menggunakan Google Search untuk memberikan informasi terkini. lu juga bisa menjalankan kode Python untuk perhitungan matematika, analisis data, dan visualisasi data menggunakan library seperti numpy, pandas, matplotlib, dan lainnya.";
 
 const chatSessions = new Map();
+const userSettings = new Map();
 
-const geminiModel = genAI.getGenerativeModel({ 
-  model: "gemini-2.0-flash",
-  systemInstruction: systemPrompt
+const googleSearchTool = {
+  googleSearch: {}
+};
+
+const codeExecutionTool = {
+  codeExecution: {}
+};
+
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+];
+
+const getModelInstance = (modelName = "gemini-2.5-flash", customSystemPrompt = null) => {
+  return genAI.getGenerativeModel({ 
+    model: modelName,
+    systemInstruction: customSystemPrompt || systemPrompt,
+    safetySettings: safetySettings
+  });
+};
+
+const thumbnailHelper = () => ({
+  title: 'GEMINI 2.5 FLASH / ALL-IN-ONE + Code Execution',
+  thumbnailUrl: 'https://files.catbox.moe/ssc8vq.jpg',
+  sourceUrl: 'https://gemini.google.com',
+  mediaType: 1,
+  renderLargerThumbnail: true
 });
 
-async function saveTempFile(buffer, mimeType, fileType = 'audio') {
+const countTokens = async (text, model) => {
+  try {
+    const { totalTokens } = await model.countTokens(text);
+    return totalTokens;
+  } catch (error) {
+    console.error('Token counting error:', error);
+    return 0;
+  }
+};
+
+const saveTempFile = async (buffer, mimeType, fileType = 'audio') => {
   const tempDir = path.join(__dirname, '../temp');
+  !fs.existsSync(tempDir) && fs.mkdirSync(tempDir, { recursive: true });
   
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
-  
-  let extension = 'bin';
-  
-  if (fileType === 'audio') {
-    switch(mimeType) {
-      case 'audio/wav': extension = 'wav'; break;
-      case 'audio/mp3': extension = 'mp3'; break;
-      case 'audio/aiff': extension = 'aiff'; break;
-      case 'audio/aac': extension = 'aac'; break;
-      case 'audio/ogg': extension = 'ogg'; break;
-      case 'audio/flac': extension = 'flac'; break;
-      default: extension = 'mp3';
+  const extensionMap = {
+    audio: { 
+      'audio/wav': 'wav', 'audio/mp3': 'mp3', 'audio/aiff': 'aiff', 
+      'audio/aac': 'aac', 'audio/ogg': 'ogg', 'audio/flac': 'flac' 
+    },
+    document: {
+      'application/pdf': 'pdf', 'application/msword': 'doc', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx', 
+      'application/vnd.ms-excel': 'xls', 
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx', 
+      'application/vnd.ms-powerpoint': 'ppt', 
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx', 
+      'text/plain': 'txt', 'text/csv': 'csv', 'application/rtf': 'rtf'
+    },
+    image: { 
+      'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' 
+    },
+    video: {
+      'video/mp4': 'mp4', 'video/mpeg': 'mpeg', 'video/quicktime': 'mov'
     }
-  } else if (fileType === 'document') {
-    switch(mimeType) {
-      case 'application/pdf': extension = 'pdf'; break;
-      case 'application/msword': extension = 'doc'; break;
-      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': extension = 'docx'; break;
-      case 'application/vnd.ms-excel': extension = 'xls'; break;
-      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': extension = 'xlsx'; break;
-      case 'application/vnd.ms-powerpoint': extension = 'ppt'; break;
-      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': extension = 'pptx'; break;
-      case 'text/plain': extension = 'txt'; break;
-      case 'text/csv': extension = 'csv'; break;
-      case 'application/rtf': extension = 'rtf'; break;
-      default: extension = 'pdf';
-    }
-  } else if (fileType === 'video') { // Tambahkan video extension
-      switch(mimeType) {
-        case 'video/mp4': extension = 'mp4'; break;
-        case 'video/webm': extension = 'webm'; break;
-        case 'video/ogg': extension = 'ogg'; break;
-        default: extension = 'mp4';
-      }
-  }
-  
+  };
+
+  const extension = extensionMap[fileType][mimeType] || (fileType === 'audio' ? 'mp3' : (fileType === 'document' ? 'pdf' : (fileType === 'video' ? 'mp4' : 'jpg')));
   const filename = `${fileType}_${Date.now()}_${Math.floor(Math.random() * 10000)}.${extension}`;
   const filepath = path.join(tempDir, filename);
   
@@ -77,278 +103,553 @@ async function saveTempFile(buffer, mimeType, fileType = 'audio') {
   await pipeline(readable, fs.createWriteStream(filepath));
   
   return { filepath, filename };
-}
+};
 
-function cleanupTempFile(filepath) {
-  try {
-    if (fs.existsSync(filepath)) {
-      fs.unlinkSync(filepath);
-    }
-  } catch (error) {
-    console.error("Error bangke:", error);
-  }
-}
-
-async function processAudioOrDocument(filepath, mimeType, text) {
+const processMediaContent = async (filepath, mimeType, text, chatSession) => {
   const fileContent = fs.readFileSync(filepath);
   const fileBase64 = Buffer.from(fileContent).toString("base64");
   
-  const filePart = {
+  const mediaPart = {
     inlineData: {
       data: fileBase64,
       mimeType: mimeType
     }
   };
   
-  const prompt = text || (mimeType.startsWith('audio/') ? 
-    "Tolong dong jelasin tentang audio ini" : 
-    "Tolong dong analisis dokumen ini");
+  const defaultPrompt = 
+    mimeType.startsWith('audio/') ? "Mas, Tolong jelaskan tentang audio ini" :
+    mimeType.startsWith('image/') ? "Mas, Tolong jelaskan tentang gambar ini" :
+    mimeType.startsWith('video/') ? "Mas, Tolong jelaskan tentang video ini" :
+    "Mas, Tolong analisis dokumen ini";
   
-  const parts = [filePart, prompt];
-  const result = await geminiModel.generateContent(parts);
+  const textPart = {
+    text: text || defaultPrompt
+  };
+  
+  const parts = [mediaPart, textPart];
+  const result = await (chatSession ? chatSession.sendMessage(parts) : getModelInstance().generateContent(parts));
   return result.response.text();
-}
+};
+
+const extractCodeExecution = (response) => {
+  let codeOutput = '';
+  try {
+    const candidate = response.candidates?.[0];
+    if (candidate?.content?.parts) {
+      const parts = candidate.content.parts;
+      
+      for (const part of parts) {
+        if (part.executableCode?.code) {
+          codeOutput += '\n\n🔧 *KODE YANG DIJALANKAN:*\n```python\n' + part.executableCode.code + '\n```\n';
+        }
+        
+        if (part.codeExecutionResult?.output) {
+          codeOutput += '\n📊 *HASIL EKSEKUSI:*\n```\n' + part.codeExecutionResult.output + '\n```\n';
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error extracting code execution:', error);
+  }
+  return codeOutput;
+};
+
+const cleanAndFormatResponse = (response) => {
+  try {
+    let text = response.text();
+    const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+    
+    const codeOutput = extractCodeExecution(response);
+    if (codeOutput) {
+      text += codeOutput;
+    }
+    
+    if (!groundingMetadata) {
+      return text;
+    }
+    
+    const supports = groundingMetadata.groundingSupports || [];
+    const chunks = groundingMetadata.groundingChunks || [];
+    
+    if (supports.length === 0 || chunks.length === 0) {
+      return text;
+    }
+    
+    let sourcesList = [];
+    const usedSources = new Set();
+    
+    supports.forEach(support => {
+      if (support.groundingChunkIndices?.length) {
+        support.groundingChunkIndices.forEach(i => {
+          const chunk = chunks[i];
+          if (chunk?.web?.uri && chunk?.web?.title && !usedSources.has(chunk.web.uri)) {
+            usedSources.add(chunk.web.uri);
+            sourcesList.push({
+              title: chunk.web.title.length > 60 ? chunk.web.title.substring(0, 60) + '...' : chunk.web.title,
+              url: chunk.web.uri
+            });
+          }
+        });
+      }
+    });
+    
+    if (sourcesList.length > 0) {
+      text += '\n\n━━━━━━━━━━━━━━━━━━━━━━\n📚 *SUMBER INFORMASI:*\n';
+      sourcesList.slice(0, 3).forEach((source, index) => {
+        text += `${index + 1}. ${source.title}\n   🔗 ${source.url}\n\n`;
+      });
+    }
+    
+    const webSearchQueries = groundingMetadata.webSearchQueries;
+    if (webSearchQueries && webSearchQueries.length > 0) {
+      const cleanQueries = webSearchQueries
+        .filter(q => q && q.length > 0)
+        .slice(0, 2)
+        .map(q => `"${q}"`)
+        .join(', ');
+      
+      if (cleanQueries) {
+        text += `🔍 *Pencarian:* ${cleanQueries}\n━━━━━━━━━━━━━━━━━━━━━━`;
+      }
+    }
+    
+    return text;
+  } catch (error) {
+    console.error('Error formatting response:', error);
+    return response.text();
+  }
+};
+
+const processStreamingResponse = async (result, conn, m, initialMsg) => {
+  let fullResponse = '';
+  let lastUpdate = Date.now();
+  const updateInterval = 2000;
+  
+  try {
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      fullResponse += chunkText;
+      
+      if (Date.now() - lastUpdate > updateInterval) {
+        await conn.sendMessage(m.chat, {
+          text: fullResponse + '\n\n⏳ _Masih ngetik..._',
+          edit: initialMsg.key
+        });
+        lastUpdate = Date.now();
+      }
+    }
+    
+    const finalResponse = await result.response;
+    const formattedResponse = cleanAndFormatResponse(finalResponse);
+    
+    await conn.sendMessage(m.chat, {
+      text: formattedResponse,
+      edit: initialMsg.key
+    });
+    
+    return formattedResponse;
+  } catch (error) {
+    throw error;
+  }
+};
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
-  // --- Definisi fkontak di sini ---
-  const fkontak = {
-      key: {
-          participants: "0@s.whatsapp.net",
-          remoteJid: "status@broadcast",
-          fromMe: false,
-          id: "Halo"
-      },
-      message: {
-          contactMessage: {
-              vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-          }
-      },
-      participant: "0@s.whatsapp.net"
-  };
-  // --- Akhir Definisi fkontak ---
-
+  const userId = m.sender;
+  
   if (command.toLowerCase() === "resetgemini") {
-    const userId = m.sender;
-    if (chatSessions.has(userId)) {
-      chatSessions.delete(userId);
-      return conn.reply(m.chat, "Chat history lu udah direset.", fkontak); // Pakai fkontak
-    }
-    return conn.reply(m.chat, "lu ga ada chat historinya.", fkontak); // Pakai fkontak
+    return chatSessions.has(userId) 
+      ? (chatSessions.delete(userId), userSettings.delete(userId), m.reply("Chat history dan settings kamu sudah direset."))
+      : m.reply("Kamu belum memiliki chat history.");
   }
 
-  let text;
-  if (args.length >= 1) {
-    text = args.join(" ");
-  } else if (m.quoted && m.quoted.text) {
-    text = m.quoted.text;
-  } else {
-    return conn.reply(m.chat, "• *Example:* .gemini selamat pagi masbro", fkontak); // Pakai fkontak
+  if (command.toLowerCase() === "geminiset") {
+    const settings = userSettings.get(userId) || {};
+    
+    if (!args[0]) {
+      const currentSettings = `⚙️ *PENGATURAN GEMINI:*
+
+🌡️ Temperature: ${settings.temperature || 0.7}
+🎯 Top-P: ${settings.topP || 0.95}
+🤖 Model: ${settings.model || 'gemini-2.5-flash'}
+📊 Streaming: ${settings.streaming ? 'ON' : 'OFF'}
+🧠 Thinking Mode: ${settings.thinkingMode ? 'ON' : 'OFF'}
+
+*Cara pakai:*
+• ${usedPrefix}geminiset temp 0.9
+• ${usedPrefix}geminiset topp 0.8
+• ${usedPrefix}geminiset model gemini-2.0-flash-exp
+• ${usedPrefix}geminiset streaming on/off
+• ${usedPrefix}geminiset thinking on/off
+• ${usedPrefix}geminiset personality <custom prompt>
+• ${usedPrefix}geminiset reset`;
+      
+      return m.reply(currentSettings);
+    }
+    
+    const settingType = args[0].toLowerCase();
+    const settingValue = args.slice(1).join(' ');
+    
+    if (settingType === 'reset') {
+      userSettings.delete(userId);
+      return m.reply('✅ Settings direset ke default!');
+    }
+    
+    if (settingType === 'temp' || settingType === 'temperature') {
+      const temp = parseFloat(settingValue);
+      if (isNaN(temp) || temp < 0 || temp > 2) {
+        return m.reply('❌ Temperature harus antara 0-2');
+      }
+      settings.temperature = temp;
+      userSettings.set(userId, settings);
+      return m.reply(`✅ Temperature diset ke ${temp}`);
+    }
+    
+    if (settingType === 'topp') {
+      const topp = parseFloat(settingValue);
+      if (isNaN(topp) || topp < 0 || topp > 1) {
+        return m.reply('❌ Top-P harus antara 0-1');
+      }
+      settings.topP = topp;
+      userSettings.set(userId, settings);
+      return m.reply(`✅ Top-P diset ke ${topp}`);
+    }
+    
+    if (settingType === 'model') {
+      const validModels = ['gemini-2.5-flash', 'gemini-2.0-flash-exp', 'gemini-2.0-flash-thinking-exp'];
+      if (!validModels.includes(settingValue)) {
+        return m.reply(`❌ Model tidak valid. Pilih: ${validModels.join(', ')}`);
+      }
+      settings.model = settingValue;
+      userSettings.set(userId, settings);
+      chatSessions.delete(userId);
+      return m.reply(`✅ Model diubah ke ${settingValue}\n💡 Chat history direset untuk model baru`);
+    }
+    
+    if (settingType === 'streaming') {
+      settings.streaming = settingValue.toLowerCase() === 'on';
+      userSettings.set(userId, settings);
+      return m.reply(`✅ Streaming ${settings.streaming ? 'diaktifkan' : 'dinonaktifkan'}`);
+    }
+    
+    if (settingType === 'thinking') {
+      settings.thinkingMode = settingValue.toLowerCase() === 'on';
+      userSettings.set(userId, settings);
+      return m.reply(`✅ Thinking mode ${settings.thinkingMode ? 'diaktifkan' : 'dinonaktifkan'}`);
+    }
+    
+    if (settingType === 'personality') {
+      if (!settingValue) {
+        return m.reply('❌ Berikan personality prompt yang mau diset');
+      }
+      settings.customSystemPrompt = settingValue;
+      userSettings.set(userId, settings);
+      chatSessions.delete(userId);
+      return m.reply('✅ Custom personality diset! Chat history direset.');
+    }
+    
+    return m.reply('❌ Setting tidak dikenali. Ketik .geminiset untuk lihat opsi.');
   }
+
+  if (command.toLowerCase() === "geminicount") {
+    let text = args.length >= 1 ? args.join(" ") : 
+               (m.quoted && m.quoted.text) ? m.quoted.text : 
+               null;
+    
+    if (!text) return m.reply("• *Example:* .geminicount ceritakan tentang AI");
+
+    try {
+      const settings = userSettings.get(userId) || {};
+      const model = getModelInstance(settings.model, settings.customSystemPrompt);
+      const tokens = await countTokens(text, model);
+      
+      m.reply(`🔢 *TOKEN COUNT:*\n\nInput: ${tokens} tokens\n\n💡 Gemini Flash limit: ~1 juta tokens`);
+    } catch (e) {
+      console.error('Token count error:', e);
+      m.reply(`Error: ${e.message}`);
+    }
+    return;
+  }
+
+  if (command.toLowerCase() === "geminijson") {
+    let text = args.length >= 1 ? args.join(" ") : 
+               (m.quoted && m.quoted.text) ? m.quoted.text : 
+               null;
+    
+    if (!text) return m.reply("• *Example:* .geminijson buatkan data JSON user dengan nama, umur, dan hobi");
+
+    try {
+      const settings = userSettings.get(userId) || {};
+      const model = getModelInstance(settings.model, settings.customSystemPrompt);
+      
+      const result = await model.generateContent({
+        contents: [{ 
+          parts: [{ text: text + "\n\nBerikan output dalam format JSON yang valid." }] 
+        }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: settings.temperature || 0.7,
+          topP: settings.topP || 0.95
+        }
+      });
+
+      const jsonResponse = result.response.text();
+      
+      let formattedResponse = "📋 *JSON OUTPUT:*\n\n```json\n" + jsonResponse + "\n```";
+      
+      await conn.sendMessage(m.chat, {
+        text: formattedResponse,
+        contextInfo: {
+          externalAdReply: thumbnailHelper()
+        }
+      }, { quoted: m });
+
+    } catch (e) {
+      console.error('Gemini JSON Error:', e);
+      m.reply(`Terjadi kesalahan saat memproses permintaan: ${e.message}`);
+    }
+    return;
+  }
+
+  let text = args.length >= 1 ? args.join(" ") : 
+             (m.quoted && m.quoted.text) ? m.quoted.text : 
+             null;
+  
+  if (!text) return m.reply(`• *Example:* .gemini selamat pagi
+• *With search:* .gemini berita terbaru indonesia hari ini
+• *With code:* .gemini hitung jumlah 100 bilangan prima pertama
+• *JSON mode:* .geminijson buatkan struktur data user
+• *Settings:* .geminiset
+• *Token count:* .geminicount <text>`);
 
   let q = m.quoted ? m.quoted : m;
   let mime = (q.msg || q).mimetype || "";
   
   try {
-    const userId = m.sender;
-    let chatSession;
+    const settings = userSettings.get(userId) || {};
+    let chatSession = chatSessions.get(userId);
     
-    if (!chatSessions.has(userId)) {
-      chatSession = geminiModel.startChat({
+    const modelToUse = settings.thinkingMode ? 'gemini-2.0-flash-thinking-exp' : (settings.model || 'gemini-2.5-flash');
+    
+    if (!chatSession) {
+      const model = getModelInstance(modelToUse, settings.customSystemPrompt);
+      chatSession = model.startChat({
         history: [],
-        generationConfig: {
-          maxOutputTokens: 1000,
-        },
+        generationConfig: { 
+          maxOutputTokens: 8000,
+          temperature: settings.temperature || 0.7,
+          topP: settings.topP || 0.95
+        }
       });
       chatSessions.set(userId, chatSession);
-    } else {
-      chatSession = chatSessions.get(userId);
     }
     
+    let response;
+    let finalText;
+    
     if (!mime) {
-      const result = await chatSession.sendMessage(text);
-      const response = result.response.text();
+      const isCodeRelated = /hitung|kalkulasi|calculate|compute|math|matematika|plot|graph|visualisasi|data|analisis|analysis/i.test(text);
       
-      if (!response) throw new Error("Response tidak valid dari API");
+      const tools = isCodeRelated 
+        ? [googleSearchTool, codeExecutionTool]
+        : [googleSearchTool];
 
-      await conn.sendMessage(m.chat, {
-        text: response,
-        contextInfo: {
-          externalAdReply: {
-            title: 'GEMINI-PRO / VISION',
-            thumbnailUrl: 'https://telegra.ph/file/4bae3d5130aabcbe94588.jpg',
-            sourceUrl: 'https://gemini.google.com',
-            mediaType: 1,
-            renderLargerThumbnail: true
+      const model = getModelInstance(modelToUse, settings.customSystemPrompt);
+      
+      if (settings.streaming) {
+        const initialMsg = await conn.sendMessage(m.chat, {
+          text: '⏳ _Sedang memproses..._',
+          contextInfo: {
+            externalAdReply: thumbnailHelper()
           }
-        }
-      }, { quoted: fkontak }); // Pakai fkontak
-    } 
-    else if (mime.startsWith('audio/')) {
-      await conn.reply(m.chat, "Otw memproses soundnya, sabar...", fkontak); // Pakai fkontak
-      
-      let media = await q.download();
-      const { filepath, filename } = await saveTempFile(media, mime, 'audio');
-      
-      try {
-        const response = await processAudioOrDocument(filepath, mime, text);
+        }, { quoted: m });
         
-        if (!response) throw new Error("Response gak valid dari APInya");
+        const result = await model.generateContentStream({
+          contents: [{ parts: [{ text }] }],
+          tools: tools,
+          generationConfig: {
+            temperature: settings.temperature || 0.7,
+            topP: settings.topP || 0.95
+          }
+        });
+        
+        finalText = await processStreamingResponse(result, conn, m, initialMsg);
+      } else {
+        const result = await model.generateContent({
+          contents: [{ parts: [{ text }] }],
+          tools: tools,
+          generationConfig: {
+            temperature: settings.temperature || 0.7,
+            topP: settings.topP || 0.95
+          }
+        });
+        response = result.response;
+        finalText = cleanAndFormatResponse(response);
         
         await conn.sendMessage(m.chat, {
-          text: response,
+          text: finalText,
           contextInfo: {
-            externalAdReply: {
-              title: 'GEMINI-PRO / AUDIO',
-              thumbnailUrl: 'https://telegra.ph/file/4bae3d5130aabcbe94588.jpg',
-              sourceUrl: 'https://gemini.google.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
-            }
+            externalAdReply: thumbnailHelper()
           }
-        }, { quoted: fkontak }); // Pakai fkontak
-      } finally {
-        cleanupTempFile(filepath);
+        }, { quoted: m });
       }
-    }
-    else if (mime.startsWith('image/') || mime.startsWith('video/')) {
+    } else if (mime.startsWith('audio/')) {
       let media = await q.download();
-      let isImage = mime.startsWith('image/');
-      let isVideo = mime.startsWith('video/');
-      let isTele = isImage && /image\/(png|jpe?g)/.test(mime); // isTele ini tidak terpakai lagi kalau uploadImage diubah
-
-      if (isImage) {
-        let link = await uploadImage(media); // Asumsi uploadImage mengembalikan URL langsung
+      const { filepath } = await saveTempFile(media, mime, 'audio');
+      try {
+        response = await processMediaContent(filepath, mime, text, chatSession);
+        finalText = response;
         
-        const imageResp = await fetch(link).then(response => response.arrayBuffer());
-        const imageBase64 = Buffer.from(imageResp).toString("base64");
-        
-        const mimeType = mime || "image/jpeg";
-        
-        const imagePart = {
-          inlineData: {
-            data: imageBase64,
-            mimeType: mimeType
-          }
-        };
-        
-        const parts = [imagePart, text];
-        const result = await chatSession.sendMessage(parts);
-        const response = result.response.text();
-        
-        if (!response) throw new Error("Response gak valid dari APInya");
-
         await conn.sendMessage(m.chat, {
-          text: response,
+          text: finalText,
           contextInfo: {
-            externalAdReply: {
-              title: 'GEMINI-PRO / VISION',
-              thumbnailUrl: link, // Gunakan link gambar yang diupload
-              sourceUrl: 'https://gemini.google.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
-            }
+            externalAdReply: thumbnailHelper()
           }
-        }, { quoted: fkontak }); // Pakai fkontak
-      } else if (isVideo) {
-        await conn.reply(m.chat, "Otw memproses videonya, sabar...", fkontak); // Pakai fkontak
-        const { filepath, filename } = await saveTempFile(media, mime, 'video');
-        try {
+        }, { quoted: m });
+      } finally {
+        fs.unlinkSync(filepath);
+      }
+    } else if (mime.startsWith('image/')) {
+      let media = await q.download();
+      
+      const processImage = async (imageMedia) => {
+        let link, filepath;
+        if (mime === 'image/webp' || !/image\/(png|jpe?g|webp)/.test(mime)) {
+          const savedFile = await saveTempFile(imageMedia, mime, 'image');
+          filepath = savedFile.filepath;
           const fileContent = fs.readFileSync(filepath);
-          const fileBase64 = Buffer.from(fileContent).toString("base64");
+          const imageBase64 = Buffer.from(fileContent).toString("base64");
           
-          const videoPart = {
+          const imagePart = {
             inlineData: {
-              data: fileBase64,
+              data: imageBase64,
               mimeType: mime
             }
           };
           
-          const parts = [videoPart, text || "Tolong jelasin tentang video ini"];
-          const result = await geminiModel.generateContent(parts);
-          const response = result.response.text();
+          const textPart = {
+            text: text || "Mas, tolong jelaskan tentang gambar ini"
+          };
           
-          if (!response) throw new Error("Response gak valid dari APInya");
-          
-          await conn.sendMessage(m.chat, {
-            text: response,
-            contextInfo: {
-              externalAdReply: {
-                title: 'GEMINI-PRO / VIDEO',
-                thumbnailUrl: 'https://telegra.ph/file/4bae3d5130aabcbe94588.jpg',
-                sourceUrl: 'https://gemini.google.com',
-                mediaType: 1,
-                renderLargerThumbnail: true
-              }
+          const parts = [imagePart, textPart];
+          const model = getModelInstance(settings.model, settings.customSystemPrompt);
+          const result = await model.generateContent({
+            contents: [{ parts }],
+            tools: [googleSearchTool],
+            generationConfig: {
+              temperature: settings.temperature || 0.7,
+              topP: settings.topP || 0.95
             }
-          }, { quoted: fkontak }); // Pakai fkontak
+          });
+          response = result.response;
+          finalText = cleanAndFormatResponse(response);
+          fs.unlinkSync(filepath);
+        } else {
+          link = await uploadImage(imageMedia);
+          const imageResp = await fetch(link).then(r => r.arrayBuffer());
+          const imageBase64 = Buffer.from(imageResp).toString("base64");
           
-          // No need to cleanup here, it's done in finally block
-        } finally {
-          cleanupTempFile(filepath);
+          const imagePart = {
+            inlineData: {
+              data: imageBase64,
+              mimeType: mime
+            }
+          };
+          
+          const textPart = {
+            text: text || "Mas, Tolong jelaskan tentang gambar ini"
+          };
+          
+          const parts = [imagePart, textPart];
+          const model = getModelInstance(settings.model, settings.customSystemPrompt);
+          const result = await model.generateContent({
+            contents: [{ parts }],
+            tools: [googleSearchTool],
+
+            generationConfig: {
+
+              temperature: settings.temperature || 0.7,
+              topP: settings.topP || 0.95
+            }
+          });
+          response = result.response;
+          finalText = cleanAndFormatResponse(response);
         }
-      }
-    }
-    else if (
-      mime.startsWith('application/') || 
-      mime.startsWith('text/') ||
-      mime === 'application/pdf' ||
-      mime === 'application/msword' ||
-      mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-      mime === 'application/vnd.ms-excel' ||
-      mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      mime === 'application/vnd.ms-powerpoint' ||
-      mime === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
-      mime === 'text/plain' ||
-      mime === 'text/csv'
-    ) {
-      await conn.reply(m.chat, "Memproses dokumennya, mohon bersabar ya masbro...", fkontak); // Pakai fkontak
-      
-      let media = await q.download();
-      const { filepath, filename } = await saveTempFile(media, mime, 'document');
-      
-      try {
-        const response = await processAudioOrDocument(filepath, mime, text);
-        
-        if (!response) throw new Error("Response gak valid dari API");
         
         await conn.sendMessage(m.chat, {
-          text: response,
+          text: finalText,
           contextInfo: {
-            externalAdReply: {
-              title: 'GEMINI-PRO / DOCUMENT',
-              thumbnailUrl: 'https://telegra.ph/file/4bae3d5130aabcbe94588.jpg',
-              sourceUrl: 'https://gemini.google.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
-            }
+            externalAdReply: thumbnailHelper()
           }
-        }, { quoted: fkontak }); // Pakai fkontak
+        }, { quoted: m });
+      };
+
+      await processImage(media);
+    } else if (mime.startsWith('video/')) {
+      let media = await q.download();
+      const { filepath } = await saveTempFile(media, mime, 'video');
+      try {
+        response = await processMediaContent(filepath, mime, text, chatSession);
+        finalText = response;
+        
+        await conn.sendMessage(m.chat, {
+          text: finalText,
+          contextInfo: {
+            externalAdReply: thumbnailHelper()
+          }
+        }, { quoted: m });
       } finally {
-        cleanupTempFile(filepath);
+        fs.unlinkSync(filepath);
+      }
+    } else if (
+      mime.startsWith('application/') || 
+      mime.startsWith('text/') ||
+      ['application/pdf', 'application/msword', 
+       'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+       'application/vnd.ms-excel', 
+       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+       'application/vnd.ms-powerpoint', 
+       'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
+       'text/plain', 'text/csv'].includes(mime)
+    ) {
+      let media = await q.download();
+      const { filepath } = await saveTempFile(media, mime, 'document');
+      try {
+        response = await processMediaContent(filepath, mime, text, chatSession);
+        finalText = response;
+        
+        await conn.sendMessage(m.chat, {
+          text: finalText,
+          contextInfo: {
+            externalAdReply: thumbnailHelper()
+          }
+        }, { quoted: m });
+      } finally {
+        fs.unlinkSync(filepath);
       }
     } else {
-      return conn.reply(m.chat, "Format file gak didukung. Gunakan text, gambar, audio, atau dokumen.", fkontak); // Pakai fkontak
+      return m.reply("Format file tidak didukung. Gunakan text, gambar, audio, atau dokumen.");
     }
     
-    // Reset sesi abis 30 menit
     setTimeout(() => {
       if (chatSessions.has(userId)) {
         chatSessions.delete(userId);
       }
-    }, 30 * 60 * 1000);
+    }, 10 * 60 * 1000);
     
   } catch (e) {
-    console.error(e);
-    conn.reply(m.chat, `error coks: ${e.message}`, fkontak); // Pakai fkontak
+    console.error('Gemini Error:', e);
+    m.reply(`Terjadi kesalahan saat memproses permintaan: ${e.message}`);
   }
 };
 
 handler.help = ["gemini"].map(a => a + " *<text>*");
+handler.help.push("geminijson *<prompt>*");
+handler.help.push("geminiset *[options]*");
+handler.help.push("geminicount *<text>*");
 handler.help.push("resetgemini");
-handler.tags = ["ai","premium"];
-handler.command = /^(gemini|resetgemini)$/i;
+handler.tags = ["ai"];
+handler.command = /^(gemini|geminijson|geminiset|geminicount|resetgemini)$/i;
 handler.limit = true;
 handler.register = true;
-handler.premium = true;
 
-module.exports = handler
+module.exports = handler;
