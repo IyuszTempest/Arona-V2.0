@@ -113,9 +113,9 @@ module.exports = handler;                        }),
     }
 }
 
-handler.help = ['instagram <link>'];
+handler.help = ['instagram2 <link>'];
 handler.tags = ['downloader'];
-handler.command = ['ig', 'instagram'];
+handler.command = ['ig2', 'instagram2'];
 handler.limit = true;
 
 module.exports = handler;
