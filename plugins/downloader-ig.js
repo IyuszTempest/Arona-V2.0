@@ -1,121 +1,69 @@
-const axios = require('axios');
+/* Plugins CJS
+Instagram downloader
+Sumber :https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635
+Author : F6F411
+*/
+const fetch = require('node-fetch')
 
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-            }
-        },
-        participant: "0@s.whatsapp.net"
-    };
-
-    if (!args[0]) {
-        return conn.reply(m.chat, `*Contoh:* ${usedPrefix + command} https://www.instagram.com/p/ByxKbUSnubS/`, fkontak);
-    }
-    if (!args[0].includes('instagram.com')) {
-        return conn.reply(m.chat, 'Link yang lu kasih bukan link Instagram!', fkontak);
+const snapins = async (urlIgPost) => {
+    const headers = {
+        "content-type": "application/x-www-form-urlencoded"
     }
 
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
+    const response = await fetch("https://snapins.ai/action.php", {
+        headers,
+        body: "url=" + encodeURIComponent(urlIgPost),
+        method: "POST"
+    })
 
-    try {
-        const api = await axios.get(`https://api.zenzxz.my.id/downloader/instagram?url=${encodeURIComponent(args[0])}`);
-        const result = api.data.result;
+    if (!response.ok) throw Error(`Gagal mendownload informasi. ${response.status} ${response.statusText}`)
 
-        if (!result || (!result.images.length && !result.videos.length)) {
-            throw new Error('Tidak ada media yang ditemukan atau link tidak valid.');
+    const json = await response.json()
+
+    const name = json.data?.[0]?.author?.name || "(no name)"
+    const username = json.data?.[0]?.author?.username || "(no username)"
+
+    let images = []
+    let videos = []
+
+    json.data?.forEach(v => {
+        if (v.type === "image") {
+            images.push(v.imageUrl)
+        } else if (v.type === "video") {
+            videos.push(v.videoUrl)
         }
+    })
 
-        const allMedia = [...(result.images || []), ...(result.videos || [])];
-        
-        await conn.reply(m.chat, `Ditemukan ${allMedia.length} media. Mengirim satu per satu...`, fkontak);
+    return { name, username, images, videos }
+}
 
-        for (let i = 0; i < allMedia.length; i++) {
-            const mediaUrl = allMedia[i];
-            let caption = `✨ *Instagram Downloader*\n*_by @${result.username}_*`;
+let handler = async (m, { conn, args, command }) => {
+    if (!args[0]) throw `Mana URL Instagram nya?\nContoh : .${command} https://www.instagram.com/p/xxxxx/`
 
-            if (i === 0 && result.name) {
-                caption += `\n\n*Caption:*\n${result.name}`;
-            }
+    // emoji proses random
+    const emojis = ['⏳', '🔄', '📡', '📥', '🔍', '🌀', '📲']
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
+    m.reply(`${randomEmoji} Sedang memproses, tunggu sebentar...`)
 
-            if (i > 0) await new Promise(resolve => setTimeout(resolve, 1500));
+    let { images, videos } = await snapins(args[0])
 
-            if (result.videos.includes(mediaUrl)) {
-                 await conn.sendMessage(m.chat, { video: { url: mediaUrl }, caption: caption }, { quoted: fkontak });
-            } else {
-                 await conn.sendMessage(m.chat, { image: { url: mediaUrl }, caption: caption }, { quoted: fkontak });
-            }
+    if (images.length > 0) {
+        await m.reply(`📷 Terdeteksi ${images.length} foto, akan dikirim...`)
+        for (const img of images) {
+            await conn.sendMessage(m.chat, { image: { url: img } }, { quoted: m })
         }
+    }
 
-    } catch (e) {
-        console.error('Error di plugin Instagram Downloader:', e);
-        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, `Terjadi kesalahan: ${e.message || 'Tidak diketahui'}. Pastikan link valid dan publik.`, fkontak);
+    if (videos.length > 0) {
+        await m.reply(`🎥 Terdeteksi ${videos.length} video, akan dikirim...`)
+        for (const vid of videos) {
+            await conn.sendMessage(m.chat, { video: { url: vid } }, { quoted: m })
+        }
     }
 }
 
-handler.help = ['instagram <link>'];
-handler.tags = ['downloader'];
-handler.command = ['ig', 'instagram'];
-handler.limit = true;
+handler.command = ['ig', 'igdl', 'instagram']
+handler.help = ['ig']
+handler.tags = ['downloader']
 
-module.exports = handler;                        }),
-                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                            buttons: [{
-                                name: "cta_url",
-                                buttonParamsJson: JSON.stringify({ display_text: Unduh Media #${i+1}, url: mediaItem.url })
-                            }]
-                        })
-                    };
-                } catch (e) {
-                    console.error(Gagal memproses item carousel ke-${i+1}:, e);
-                    return null; // Kembalikan null jika item ini gagal diproses
-                }
-            });
-
-            // Jalankan semua promise secara paralel dan filter hasil yang gagal (null)
-            const carouselCards = (await Promise.all(cardPromises)).filter(card => card !== null);
-            // --- AKHIR PERBAIKAN ---
-
-            if (carouselCards.length > 0) {
-                const carouselMessage = generateWAMessageFromContent(m.chat, {
-                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-                        body: proto.Message.InteractiveMessage.Body.create({ text: *Hai, ${m.pushName}!* Post ini berisi ${media.length} media. }),
-                        footer: proto.Message.InteractiveMessage.Footer.create({ text: "Geser kartu untuk melihat semua media ➡" }),
-                        header: proto.Message.InteractiveMessage.Header.create({ title: 📸 Instagram Downloader, hasMediaAttachment: false }),
-                        carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
-                            cards: carouselCards,
-                            messageVersion: 1
-                        })
-                    })
-                }, { userJid: conn.user.id, quoted: fkontak });
-
-                await conn.relayMessage(m.chat, carouselMessage.message, { messageId: carouselMessage.key.id });
-            } else {
-                await conn.reply(m.chat, 'Gagal membuat tampilan carousel, mengirim media satu per satu...', fkontak);
-                for (const mediaItem of media) {
-                    await conn.sendFile(m.chat, mediaItem.url, '', *Instagram Downloader - ${mediaItem.type}*, fkontak);
-                }
-            }
-        }
-
-    } catch (e) {
-        console.error('Error di plugin Instagram Downloader:', e);
-        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, Terjadi kesalahan: ${e.message || 'Tidak diketahui'}. Pastikan link valid dan publik., fkontak);
-    }
-}
-
-handler.help = ['instagram <link>'];
-handler.tags = ['downloader'];
-handler.command = ['ig', 'instagram'];
-handler.limit = true;
-
-module.exports = handler;
+module.exports = handler
