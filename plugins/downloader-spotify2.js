@@ -87,8 +87,8 @@ let handler = async (m, { conn, args }) => {
     }
 }
 
-handler.help = ["spotify <judul lagu>"];
-handler.command = ["spotify", "splay"];
+handler.help = ["spotify2 <judul lagu>"];
+handler.command = ["spotify2", "splay2"];
 handler.tags = ['downloader'];
 handler.limit = true;
 
