@@ -10,7 +10,7 @@ let handler = async (m, { conn, command }) => {
         },
         message: {
             contactMessage: {
-                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
             }
         },
         participant: "0@s.whatsapp.net"
@@ -27,7 +27,7 @@ let handler = async (m, { conn, command }) => {
         }
 
         const imageUrl = data.media.url;
-        const captionText = Istri Owner Nih Euphylia Magenta.;
+        const captionText = `Istri Owner Nih Euphylia Magenta.`;
 
     
         await conn.sendFile(
@@ -44,9 +44,9 @@ let handler = async (m, { conn, command }) => {
     }
 };
 
-handler.help = ['euphyimg', 'randomeuphylia'];
+handler.help = ['euphyimg', 'randomeuphylia', 'randomeuphy'];
 handler.tags = ['anime'];
-handler.command = ['euphyimg', 'randomeuphylia'];
+handler.command = ['euphyimg', 'randomeuphylia', 'randomeuphy'];
 handler.limit = true;
 
 module.exports = handler;
