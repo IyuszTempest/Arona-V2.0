@@ -64,7 +64,6 @@ let handler = async (m, { conn, prefix }) => {
 ╰━━━━「 ${wm} 」━━━━╯
     `.trim();
 
-    let vn = "./arona/mode.mp3";
 
     try {
         await conn.sendMessage(m.chat, {
@@ -74,17 +73,6 @@ let handler = async (m, { conn, prefix }) => {
             footer: wm,
             mimetype: 'video/mp4'
         }, { quoted: fkontak });
-
-        if (require('fs').existsSync(vn)) {
-            // Mengirim audio sebagai voice note murni tanpa thumbnail
-            await conn.sendMessage(m.chat, {
-                audio: { url: vn },
-                mimetype: 'audio/mp4',
-                ptt: true
-            }, { quoted: fkontak });
-        } else {
-            console.log(`File audio tidak ditemukan di path: ${vn}`);
-        }
         
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
@@ -109,3 +97,4 @@ function clockString(ms) {
     let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60;
     return `${d} Hari ${h} Jam ${m} Menit ${s} Detik`;
 }
+  
