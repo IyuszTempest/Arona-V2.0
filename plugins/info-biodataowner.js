@@ -4,8 +4,8 @@ Author : Alfat.syah
 Sumber :https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635
 */
 
-const imageUrl = ${global.mediabiodata}
-const sourceUrl = ${global.instagramowner}
+const imageUrl = `${global.mediabiodata}`;
+const sourceUrl = `${global.instagramowner}`;
 const title = "👑 Owner Bot"
 const body = "Informasi lengkap tentang owner bot ini"
 
@@ -50,7 +50,7 @@ const handler = async (m, { conn }) => {
   }, { quoted: m })
 
 
-  await conn.sendContact(m.chat, [[${global.numberowner}, ${global.nameowner}]], m,)
+  await conn.sendContact(m.chat, `[[${global.numberowner}, ${global.nameowner}]]`, m,)
 }
 
 handler.help = ['infoowner', 'biodataowner']
