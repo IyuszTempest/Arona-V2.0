@@ -1,23 +1,28 @@
 /*
  * Plugins CJs
- * Spotify Play Via AIO
+ * Spotify Play (siputzx Search + aio Downloader)
  */
 
 const axios = require('axios');
 
+// API Key untuk downloader, diambil dari environment atau fallback
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || '1dda0d29d3mshc5f2aacec619c44p16f219jsn99a62a516f98';
 
+// --- FUNGSI PENCARI LAGU (DIGANTI KEMBALI KE SIPUTZX SESUAI PERMINTAAN) ---
 async function searchSpotify(query) {
-    const apiUrl = https://ytdlpyton.nvlgroup.my.id/spotify/search?query=${encodeURIComponent(query)};
+    const apiUrl = `https://api.siputzx.my.id/api/s/spotify?query=${encodeURIComponent(query)}`;
     const { data } = await axios.get(apiUrl);
-
-    if (!data.results || data.results.length === 0) {
-        throw new Error(Lagu "${query}" tidak ditemukan.);
+    
+    if (!data.status || !data.data || data.data.length === 0) {
+        throw new Error('Tidak ada hasil yang ditemukan dari API search (siputzx).');
     }
-
-    return data.results[0].spotify_url;
+    
+    // Mengembalikan link Spotify dari hasil pertama
+    return data.data[0].track_url;
 }
 
+
+// --- FUNGSI DOWNLOADER (TETAP PAKAI AIO) ---
 async function aio(url) {
     try {
         if (!url || !url.startsWith('http')) {
@@ -43,10 +48,11 @@ async function aio(url) {
         return data;
     } catch (error) {
         console.error('Error in aio function:', error.message);
-        throw new Error(Terjadi kesalahan saat mengakses API downloader: ${error.message});
+        throw new Error(`Terjadi kesalahan saat mengakses API downloader: ${error.message}`);
     }
 }
 
+// --- HANDLER UTAMA ---
 let handler = async (m, { conn, args }) => {
     const fkontak = {
         key: {
@@ -57,7 +63,7 @@ let handler = async (m, { conn, args }) => {
         },
         message: {
             contactMessage: {
-                vcard: BEGIN:VCARD\nVERSION:3.0\nN:Bot Arona;;;\nFN:Bot Arona\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
             }
         },
         participant: "0@s.whatsapp.net"
@@ -70,7 +76,7 @@ let handler = async (m, { conn, args }) => {
 
         const query = args.join(' ');
         await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
-
+        
         const spotifyUrl = await searchSpotify(query);
         const downloadResult = await aio(spotifyUrl);
         const audio = downloadResult.medias.find(media => media.type === 'audio');
@@ -79,21 +85,19 @@ let handler = async (m, { conn, args }) => {
             return conn.reply(m.chat, 'Tidak ditemukan file audio dari link Spotify tersebut. Coba cari lagu lain.', fkontak);
         }
         
-        await conn.reply(m.chat, Audio ditemukan, mengunduh file...\n*Judul:* ${downloadResult.title || 'audio'}, fkontak);
+
         const audioBuffer = await axios.get(audio.url, {
             responseType: 'arraybuffer'
         }).then(res => res.data);
-
        
         await conn.sendMessage(m.chat, {
             audio: audioBuffer, 
             mimetype: 'audio/mpeg',
-            fileName: ${downloadResult.title || 'audio'}.mp3,
-            ptt: false,
+            fileName: `${downloadResult.title || 'audio'}.mp3`,
             contextInfo: {
                 externalAdReply: {
                     title: downloadResult.title || 'Downloaded Audio',
-                    body: Dari: ${downloadResult.source || 'Link'},
+                    body: `Dari: ${downloadResult.source || 'Link'}`,
                     thumbnailUrl: downloadResult.thumbnail || 'https://telegra.ph/file/9914d35122605f2479f60.jpg',
                     sourceUrl: spotifyUrl,
                     mediaType: 1,
@@ -105,7 +109,7 @@ let handler = async (m, { conn, args }) => {
     } catch (error) {
         console.error("Error di plugin Spotify:", error);
         await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
-        conn.reply(m.chat, Gomenasai, terjadi kesalahan: ${error.message}. Coba lagi nanti., fkontak);
+        conn.reply(m.chat, `Gomenasai, terjadi kesalahan: ${error.message}. Coba lagi nanti.`, fkontak);
     }
 }
 
