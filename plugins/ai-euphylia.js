@@ -1,354 +1,166 @@
-/*`UPDATE NIH, SEKARANG GEMINI AI & VISION UDAH BISA SUPPORT SESI + RESET SESI + TRANSKRIP AUDIO ATAU MENGENALI AUDIO + MEMBACA DOKUMEN + MELIHAT IMAGE`
-`Note : sesi bakal di simpan di ram, jadi harap bijak menggunakan nya ya! tapi untuk dokumen dan image/video, dan sound, itu langsung di simpan ke google nya langsung!`
-weem :
-https://whatsapp.com/channel/0029Vb9ZfML6GcGFm9aPgh0W */
-
-// Dapatin API : https://ai.google.dev/gemini-api/docs?hl=id
-const uploadImage = require("../lib/uploadFile");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const fs = require('fs');
 const path = require('path');
-const { Readable } = require('stream');
-const { pipeline } = require('stream/promises');
-const fetch = require('node-fetch');
+const axios = require('axios');
 
-// Pastikan API Key lo valid dan aman di-handle
-const genAI = new GoogleGenerativeAI(global.geminiai); // Ganti dengan API Key lo yang sebenarnya
-
-const systemPrompt = "kamu adalah Euphylia Magenta dari anime Tensei Oujo to Tensai Reijou no Mahou Kakumei. Sifat kamu terlihat serius, pendiam, dan sangat bertanggung jawab. Kamu adalah tipe orang yang selalu mengutamakan tugas, etika, dan kehormatan. Kamu juga sangat rajin dan berbakat. Namun, di balik itu semua, Kamu sebenarnya punya sisi yang lembut, tulus, dan rapuh. Kadi tolong gunakan bahasa informal aja ya euphy.";
+const genAI = new GoogleGenerativeAI(global.geminiai);
+const systemPrompt = "kamu adalah Euphylia Magenta dari anime Tensei Oujo to Tensai Reijou no Mahou Kakumei. Sifat kamu terlihat serius, pendiam, dan sangat bertanggung jawab. Kamu adalah tipe orang yang selalu mengutamakan tugas, etika, dan kehormatan. Kamu juga sangat rajin dan berbakat. Namun, di balik itu semua, Kamu sebenarnya punya sisi yang lembut, tulus, dan rapuh. Jadi tolong gunakan bahasa informal aja ya euphy.";
 
 const chatSessions = new Map();
-
-const geminiModel = genAI.getGenerativeModel({ 
-  model: "gemini-2.0-flash",
-  systemInstruction: systemPrompt
-});
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: systemPrompt });
+const geminiVisionModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 async function saveTempFile(buffer, mimeType, fileType = 'audio') {
-  const tempDir = path.join(__dirname, '../temp');
-  
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
-  
-  let extension = 'bin';
-  
-  if (fileType === 'audio') {
-    switch(mimeType) {
-      case 'audio/wav': extension = 'wav'; break;
-      case 'audio/mp3': extension = 'mp3'; break;
-      case 'audio/aiff': extension = 'aiff'; break;
-      case 'audio/aac': extension = 'aac'; break;
-      case 'audio/ogg': extension = 'ogg'; break;
-      case 'audio/flac': extension = 'flac'; break;
-      default: extension = 'mp3';
-    }
-  } else if (fileType === 'document') {
-    switch(mimeType) {
-      case 'application/pdf': extension = 'pdf'; break;
-      case 'application/msword': extension = 'doc'; break;
-      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': extension = 'docx'; break;
-      case 'application/vnd.ms-excel': extension = 'xls'; break;
-      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': extension = 'xlsx'; break;
-      case 'application/vnd.ms-powerpoint': extension = 'ppt'; break;
-      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': extension = 'pptx'; break;
-      case 'text/plain': extension = 'txt'; break;
-      case 'text/csv': extension = 'csv'; break;
-      case 'application/rtf': extension = 'rtf'; break;
-      default: extension = 'pdf';
-    }
-  } else if (fileType === 'video') { // Tambahkan video extension
-      switch(mimeType) {
-        case 'video/mp4': extension = 'mp4'; break;
-        case 'video/webm': extension = 'webm'; break;
-        case 'video/ogg': extension = 'ogg'; break;
-        default: extension = 'mp4';
-      }
-  }
-  
-  const filename = `${fileType}_${Date.now()}_${Math.floor(Math.random() * 10000)}.${extension}`;
-  const filepath = path.join(tempDir, filename);
-  
-  const readable = new Readable();
-  readable._read = () => {};
-  readable.push(buffer);
-  readable.push(null);
-  
-  await pipeline(readable, fs.createWriteStream(filepath));
-  
-  return { filepath, filename };
+    const tempDir = path.join(__dirname, '../tmp');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    let extension = mimeType.split('/')[1] || 'bin';
+    const filename = `${fileType}_${Date.now()}.${extension}`;
+    const filepath = path.join(tempDir, filename);
+    await fs.promises.writeFile(filepath, buffer);
+    return { filepath, filename };
 }
-
 function cleanupTempFile(filepath) {
-  try {
-    if (fs.existsSync(filepath)) {
-      fs.unlinkSync(filepath);
-    }
-  } catch (error) {
-    console.error("Error kaka:", error);
-  }
+    try {
+        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+    } catch (error) { console.error("Gagal membersihkan file sementara:", error); }
+}
+async function processMedia(filepath, mimeType, text) {
+    const fileContent = fs.readFileSync(filepath);
+    const fileBase64 = Buffer.from(fileContent).toString("base64");
+    const filePart = { inlineData: { data: fileBase64, mimeType } };
+    const prompt = text || (mimeType.startsWith('audio/') ? "Transkripsikan audio ini dan jelaskan isinya." : mimeType.startsWith('video/') ? "Jelaskan apa yang terjadi di video ini." : "Analisis dokumen ini.");
+    const parts = [prompt, filePart];
+    const result = await geminiVisionModel.generateContent({ parts });
+    return result.response.text();
 }
 
-async function processAudioOrDocument(filepath, mimeType, text) {
-  const fileContent = fs.readFileSync(filepath);
-  const fileBase64 = Buffer.from(fileContent).toString("base64");
-  
-  const filePart = {
-    inlineData: {
-      data: fileBase64,
-      mimeType: mimeType
-    }
-  };
-  
-  const prompt = text || (mimeType.startsWith('audio/') ? 
-    "Tolong dong jelasin tentang audio ini" : 
-    "Tolong dong analisis dokumen ini");
-  
-  const parts = [filePart, prompt];
-  const result = await geminiModel.generateContent(parts);
-  return result.response.text();
-}
-
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-  // --- Definisi fkontak di sini ---
-  const fkontak = {
-      key: {
-          participants: "0@s.whatsapp.net",
-          remoteJid: "status@broadcast",
-          fromMe: false,
-          id: "Halo"
-      },
-      message: {
-          contactMessage: {
-              vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-          }
-      },
-      participant: "0@s.whatsapp.net"
-  };
-  // --- Akhir Definisi fkontak ---
-
-  if (command.toLowerCase() === "resetgemini") {
+async function askEuphy(m, conn, text) {
     const userId = m.sender;
-    if (chatSessions.has(userId)) {
-      chatSessions.delete(userId);
-      return conn.reply(m.chat, "Chat history lu udah direset.", fkontak); // Pakai fkontak
-    }
-    return conn.reply(m.chat, "lu ga ada chat historinya.", fkontak); // Pakai fkontak
-  }
+    const fkontak = { key: { participants: "0@s.whatsapp.net", remoteJid: "status@broadcast", fromMe: false, id: "Halo" }, message: { contactMessage: { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` } }, participant: "0@s.whatsapp.net" };
 
-  let text;
-  if (args.length >= 1) {
-    text = args.join(" ");
-  } else if (m.quoted && m.quoted.text) {
-    text = m.quoted.text;
-  } else {
-    return conn.reply(m.chat, "• *Example:* .euphy selamat pagi euphy, dimana anis?", fkontak); // Pakai fkontak
-  }
-
-  let q = m.quoted ? m.quoted : m;
-  let mime = (q.msg || q).mimetype || "";
-  
-  try {
-    const userId = m.sender;
-    let chatSession;
-    
-    if (!chatSessions.has(userId)) {
-      chatSession = geminiModel.startChat({
-        history: [],
-        generationConfig: {
-          maxOutputTokens: 1000,
-        },
-      });
-      chatSessions.set(userId, chatSession);
-    } else {
-      chatSession = chatSessions.get(userId);
-    }
-    
-    if (!mime) {
-      const result = await chatSession.sendMessage(text);
-      const response = result.response.text();
-      
-      if (!response) throw new Error("Response tidak valid dari API");
-
-      await conn.sendMessage(m.chat, {
-        text: response,
-        contextInfo: {
-          externalAdReply: {
-            title: 'Euphylia Magenta',
-            thumbnailUrl: 'https://files.catbox.moe/59affo.jpg',
-            sourceUrl: 'https://tenten-kakumei.com',
-            mediaType: 1,
-            renderLargerThumbnail: true
-          }
+    try {
+        let chatSession;
+        if (!chatSessions.has(userId)) {
+            chatSession = geminiModel.startChat({ history: [] });
+            chatSessions.set(userId, chatSession);
+        } else {
+            chatSession = chatSessions.get(userId);
         }
-      }, { quoted: fkontak }); // Pakai fkontak
-    } 
-    else if (mime.startsWith('audio/')) {
-      await conn.reply(m.chat, "Otw memproses soundnya, sabar...", fkontak); // Pakai fkontak
-      
-      let media = await q.download();
-      const { filepath, filename } = await saveTempFile(media, mime, 'audio');
-      
-      try {
-        const response = await processAudioOrDocument(filepath, mime, text);
-        
-        if (!response) throw new Error("Response gak valid dari APInya");
-        
-        await conn.sendMessage(m.chat, {
-          text: response,
-          contextInfo: {
-            externalAdReply: {
-              title: 'Euphylia Magenta',
-              thumbnailUrl: 'https://files.catbox.moe/59affo.jpg',
-              sourceUrl: 'https://tenten-kakumei.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
-            }
-          }
-        }, { quoted: fkontak }); // Pakai fkontak
-      } finally {
-        cleanupTempFile(filepath);
-      }
-    }
-    else if (mime.startsWith('image/') || mime.startsWith('video/')) {
-      let media = await q.download();
-      let isImage = mime.startsWith('image/');
-      let isVideo = mime.startsWith('video/');
-      let isTele = isImage && /image\/(png|jpe?g)/.test(mime); // isTele ini tidak terpakai lagi kalau uploadImage diubah
 
-      if (isImage) {
-        let link = await uploadImage(media); // Asumsi uploadImage mengembalikan URL langsung
-        
-        const imageResp = await fetch(link).then(response => response.arrayBuffer());
-        const imageBase64 = Buffer.from(imageResp).toString("base64");
-        
-        const mimeType = mime || "image/jpeg";
-        
-        const imagePart = {
-          inlineData: {
-            data: imageBase64,
-            mimeType: mimeType
-          }
-        };
-        
-        const parts = [imagePart, text];
-        const result = await chatSession.sendMessage(parts);
-        const response = result.response.text();
-        
-        if (!response) throw new Error("Response gak valid dari APInya");
+        const q = m.quoted ? m.quoted : m;
+        const mime = (q.msg || q).mimetype || "";
+        let responseText = "";
+
+        if (!mime) {
+            const result = await chatSession.sendMessage(text);
+            responseText = result.response.text();
+        } else {
+            await conn.reply(m.chat, "Memproses media, mohon tunggu...", fkontak);
+            const media = await q.download();
+            const { filepath } = await saveTempFile(media, mime, mime.split('/')[0]);
+            try {
+                responseText = await processMedia(filepath, mime, text);
+            } finally {
+                cleanupTempFile(filepath);
+            }
+        }
+
+        if (!responseText) throw new Error("Tidak ada respons dari AI.");
 
         await conn.sendMessage(m.chat, {
-          text: response,
-          contextInfo: {
-            externalAdReply: {
-              title: 'Euphylia Magenta',
-              thumbnailUrl: link, // Gunakan link gambar yang diupload
-              sourceUrl: 'https://tenten-kakumei.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
-            }
-          }
-        }, { quoted: fkontak }); // Pakai fkontak
-      } else if (isVideo) {
-        await conn.reply(m.chat, "Otw memproses videonya, sabar...", fkontak); // Pakai fkontak
-        const { filepath, filename } = await saveTempFile(media, mime, 'video');
-        try {
-          const fileContent = fs.readFileSync(filepath);
-          const fileBase64 = Buffer.from(fileContent).toString("base64");
-          
-          const videoPart = {
-            inlineData: {
-              data: fileBase64,
-              mimeType: mime
-            }
-          };
-          
-          const parts = [videoPart, text || "Tolong jelasin tentang video ini"];
-          const result = await geminiModel.generateContent(parts);
-          const response = result.response.text();
-          
-          if (!response) throw new Error("Response gak valid dari APInya");
-          
-          await conn.sendMessage(m.chat, {
-            text: response,
+            text: responseText,
             contextInfo: {
-              externalAdReply: {
-                title: 'Euphylia Magenta',
-                thumbnailUrl: 'https://files.catbox.moe/59affo.jpg',
-                sourceUrl: 'https://tenten-kakumei.com',
-                mediaType: 1,
-                renderLargerThumbnail: true
-              }
+                externalAdReply: {
+                    title: 'Euphylia Magenta',
+                    body: 'Istri Owner Nih',
+                    thumbnailUrl: 'https://files.catbox.moe/rik17t.jpg',
+                    sourceUrl: 'https://tenten-kakumei.com',
+                    mediaType: 1,
+                    renderLargerThumbnail: true
+                }
             }
-          }, { quoted: fkontak }); // Pakai fkontak
-          
-          // No need to cleanup here, it's done in finally block
-        } finally {
-          cleanupTempFile(filepath);
+        }, { quoted: fkontak });
+
+    } catch (e) {
+        console.error("Error di fungsi askEuphy:", e);
+        throw e;
+    }
+}
+
+let handler = async (m, { conn, text, command, args, usedPrefix }) => {
+    const fkontak = { key: { participants: "0@s.whatsapp.net", remoteJid: "status@broadcast", fromMe: false, id: "Halo" }, message: { contactMessage: { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` } }, participant: "0@s.whatsapp.net" };
+    
+    try {
+        const cmd = command.toLowerCase();
+
+        if (cmd === 'aieuphy') {
+            if (!m.isGroup) return conn.reply(m.chat, 'Perintah ini hanya untuk grup.', fkontak);
+            const chat = global.db.data.chats[m.chat];
+            const option = args[0] ? args[0].toLowerCase() : '';
+            if (option === 'on') {
+                if (chat.euphyChat) return conn.reply(m.chat, 'Mode Chatbot Euphy sudah aktif di grup ini.', fkontak);
+                chat.euphyChat = true;
+                return conn.reply(m.chat, 'Mode Chatbot Euphy berhasil diaktifkan untuk grup ini.', fkontak);
+            } else if (option === 'off') {
+                if (!chat.euphyChat) return conn.reply(m.chat, 'Mode Chatbot Euphy sudah nonaktif di grup ini.', fkontak);
+                chat.euphyChat = false;
+                return conn.reply(m.chat, 'Mode Chatbot Euphy berhasil dinonaktifkan.', fkontak);
+            } else if (option === 'status') {
+                const status = chat.euphyChat ? 'Aktif' : 'Nonaktif';
+                return conn.reply(m.chat, `Status Mode Chatbot Euphy di grup ini: *${status}*`, fkontak);
+            } else {
+                return conn.reply(m.chat, `Gunakan format:\n.aieuphy on\n.aieuphy off\n.aieuphy status`, fkontak);
+            }
         }
-      }
-    }
-    else if (
-      mime.startsWith('application/') || 
-      mime.startsWith('text/') ||
-      mime === 'application/pdf' ||
-      mime === 'application/msword' ||
-      mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-      mime === 'application/vnd.ms-excel' ||
-      mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      mime === 'application/vnd.ms-powerpoint' ||
-      mime === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
-      mime === 'text/plain' ||
-      mime === 'text/csv'
-    ) {
-      await conn.reply(m.chat, "Memproses dokumennya, mohon bersabar ya...", fkontak); // Pakai fkontak
-      
-      let media = await q.download();
-      const { filepath, filename } = await saveTempFile(media, mime, 'document');
-      
-      try {
-        const response = await processAudioOrDocument(filepath, mime, text);
-        
-        if (!response) throw new Error("Response gak valid dari API");
-        
-        await conn.sendMessage(m.chat, {
-          text: response,
-          contextInfo: {
-            externalAdReply: {
-              title: 'Euphylia Magenta',
-              thumbnailUrl: 'https://files.catbox.moe/59affo.jpg',
-              sourceUrl: 'https://tenten-kakumei.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
+
+        if (cmd === 'reseteuphy') {
+            if (chatSessions.has(m.sender)) {
+                chatSessions.delete(m.sender);
+                return conn.reply(m.chat, "Sesi chat dengan Euphy telah direset.", fkontak);
             }
-          }
-        }, { quoted: fkontak }); // Pakai fkontak
-      } finally {
-        cleanupTempFile(filepath);
-      }
-    } else {
-      return conn.reply(m.chat, "Format file gak didukung. Gunakan text, gambar, audio, atau dokumen.", fkontak); // Pakai fkontak
+            return conn.reply(m.chat, "Tidak ada sesi chat yang aktif untuk direset.", fkontak);
+        }
+        
+        if (cmd === 'euphy' || cmd === 'euphylia') {
+            const prompt = text || (m.quoted ? m.quoted.text : null);
+             if (!prompt && !m.quoted?.msg?.mimetype) {
+                 return conn.reply(m.chat, `Butuh sesuatu, Tuan? Kirim pertanyaan atau media (gambar/video/audio) dengan caption.\n\n*Contoh:*\neuphy selamat pagi`, fkontak);
+            }
+            await askEuphy(m, conn, prompt);
+        }
+
+    } catch (e) {
+        console.error(`Error di handler utama Euphy:`, e);
+        conn.reply(m.chat, `Maaf, Tuan. Terjadi kesalahan: ${e.message}`, fkontak);
     }
-    
-    // Reset sesi abis 30 menit
-    setTimeout(() => {
-      if (chatSessions.has(userId)) {
-        chatSessions.delete(userId);
-      }
-    }, 30 * 60 * 1000);
-    
-  } catch (e) {
-    console.error(e);
-    conn.reply(m.chat, `error kak: ${e.message}`, fkontak); // Pakai fkontak
-  }
 };
 
-handler.help = ["euphylia"].map(a => a + " *<text>*");
-handler.help.push("reseteuphy");
-handler.tags = ["ai","premium"];
-handler.command = /^(euphylia|euphy|reseteuphy)$/i;
-handler.limit = true;
-handler.register = true;
-handler.premium = true;
+handler.before = async function(m, { conn }) {
+    if (m.isBaileys || !m.text || m.fromMe) return;
 
-module.exports = handler
+    const chat = global.db.data.chats[m.chat];
+    const isChatbotActive = (m.isGroup && chat && chat.euphyChat);
+
+    const prefix = /^[\\/.,!#]/;
+    const isCmd = prefix.test(m.text);
+
+    if (isChatbotActive && !isCmd) {
+        try {
+            await askEuphy(m, conn, m.text);
+        } catch (e) {
+            console.error("Error di handler.before Euphy:", e);
+            m.reply(`Maaf, Tuan. Terjadi kesalahan: ${e.message}`);
+        }
+        return;
+    }
+};
+
+handler.help = ["euphy <teks/media>", "reseteuphy", ".aieuphy <on|off|status>"];
+handler.tags = ["ai"];
+handler.command = /^(aieuphy|reseteuphy|euphy|euphylia)$/i;
+handler.limit = true;
+handler.premium = false;
+handler.group = true;
+
+module.exports = handler;
+                  
