@@ -20,10 +20,10 @@ let handler = async (m, { conn }) => {
 
     let ye = `@${m.sender.split`@`[0]}`;
     let esce = `
-*✨ Source Code Bot Arona* ✨
+*✨ Script Bot Arona* ✨
 
-Halo masbro *${ye}*!
-Bot ini menggunakan base script *Arona MD V14*, yang dikembangkan oleh *IyuszTempest*. Script ini menggunakan base dari Botcahx!!
+Halo *${ye}*!
+Bot ini menggunakan base script *Arona MD V15*, yang dikembangkan oleh *IyuszTempest*. Script ini menggunakan base dari Botcahx!!
 
 _Repository_ utama bisa dicek di sini:
 *➤ Repository Arona MD:*
