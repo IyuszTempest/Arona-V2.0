@@ -29,7 +29,7 @@ global.pwmega = 'passwordmegalu' //ini password akun mega lu, buat plugin up meg
 
 //#Media Sosial Owner
 global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau ch atau gc
-global.instagramowner = 'https://www.instagram.com/iyusz_tempest?igsh=MWdoemNtdmoxdTBzbA==' //wajib
+global.instagramowner = 'https://www.instagram.com/iyusz_tech?igsh=MTF2YnJjNmJ3ZXZ5cA==' //wajib
 global.websiteowner = 'https://iyusztempest.my.id' //kalau ga ada ya biarin aja biar ga error
 global.pinterestowner = 'https://pin.it/ZJ73l4SqA'
 global.facebookowner = 'https://www.facebook.com/Iyusz.nime?mibextid=ZbWKwL'
