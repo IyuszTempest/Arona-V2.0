@@ -1,5 +1,5 @@
 /*Plugins CJS 
-Menu Utama Bot Arona
+Menu Utama
 */
 const {
     BufferJSON,
@@ -35,17 +35,28 @@ const allTags = {
 };
 
 const defaultMenu = {
-    before: `Halo *%name* 👋, selamat datang di *${global.namebot}*!
-    
-    🗓️ Tanggal: *%date*
-    🕰️ Waktu: *%time*
-    ⏳ Uptime: *%uptime*
-    
-    Ini daftar menu yang tersedia:`,
-    header: '「 *%category* 」',
-    body: '│  • %cmd %islimit %isPremium',
-    footer: '└───────────────────',
+    before: `
+Halo *%name*! ✨ Selamat datang di *${global.namebot}*.
+
+╭─「 *STATUS KAMU* 」
+│ Level: *%level*
+│ Exp: *%exp*
+│ Role: *%role*
+╰─────────────
+
+╭─「 *INFO BOT* 」
+│ Uptime: *%uptime*
+│ Tanggal: *%date*
+│ Waktu: *%time*
+╰─────────────
+
+Berikut adalah menu-menu spesial yang sudah aku siapin untuk kamu!
+`,
+    header: '╭─「 *%category* 」',
+    body: '│ • %cmd %islimit %isPremium',
+    footer: '╰─────────────',
     after: `Powered by ${global.wm}`
+    
 }; 
 
 let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
@@ -92,23 +103,25 @@ let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
         let replaceVars = { '%': '%', p: _p, uptime, name, date, time, exp, limit, level, role };
 
         if (!requestedCategory || requestedCategory === 'all') {
-            let menuList = `${defaultMenu.before}\n\n*— Kategori Menu* —\n\n`;
-            menuList += `• ⭐ *${_p}menupremium* (Khusus Premium)\n`;
-            menuList += `• 🌸 *${_p}menuanime* (Kumpulan Anime)\n`;
-            menuList += `• ⚔️ *${_p}menurpg* (Petualangan RPG)\n`;
-            menuList += `• 🔞 *${_p}menunsfw* (Menu Dewasa)\n`;
-            menuList += `• 🛠️ *${_p}menutools* (Alat Bantu)\n`;
-            menuList += `• 🤖 *${_p}menuai* (Kecerdasan Buatan)\n`;
-            menuList += `• 📥 *${_p}menudownloader* (Unduh Media)\n\n`;
+            let menuList = `${defaultMenu.before}\n`;
+            menuList += `╭─「 *MENU SPESIAL* 」\n`;
+            menuList += `│ • ⭐ *${_p}menupremium*\n`;
+            menuList += `│ • 🌸 *${_p}menuanime*\n`;
+            menuList += `│ • ⚔️ *${_p}menurpg*\n`;
+            menuList += `│ • 🔞 *${_p}menunsfw*\n`;
+            menuList += `│ • 🛠️ *${_p}menutools*\n`;
+            menuList += `│ • 🤖 *${_p}menuai*\n`;
+            menuList += `│ • 📥 *${_p}menudownloader*\n`;
+            menuList += `╰─────────────\n\n`;
             
-            menuList += `*— ✨ Menu Lainnya ✨* —\n\n`;
+            menuList += `╭─「 *MENU LAINNYA* 」\n`;
 
             for (let tag of arrayMenu) {
                 if (tag && tag !== 'all' && tag !== '' && allTags[tag] && !['rpg', 'rpgG', 'nsfw', 'tools', 'ai', 'downloader', 'anime', 'premium'].includes(tag)) {
-                    menuList += `• ◦ *${_p}menu* ${tag} (${allTags[tag].replace(/MENU /i, '')})\n`;
+                    menuList += `│ • *${_p}menu* ${tag}\n`;
                 }
             }
-            menuList += `\n${defaultMenu.after.replace(/<category>/g, 'Semua Menu')}`;
+            menuList += `╰─────────────\n\n${defaultMenu.after.replace(/<category>/g, 'Semua Menu')}`;
 
             let textOutput = menuList.replace(new RegExp(`%(${Object.keys(replaceVars).sort((a, b) => b.length - a.length).join('|')})`, 'g'), (_, key) => '' + replaceVars[key]);
             
@@ -158,7 +171,7 @@ let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
         }
 
         let menuCategoryContent = defaultMenu.before + '\n\n';
-        menuCategoryContent += defaultMenu.header.replace(/%category/g, allTags[requestedCategory].toUpperCase()) + '\n';
+        menuCategoryContent += defaultMenu.header.replace(/%category/g, allTags[requestedCategory]) + '\n';
         let categoryCommands = help.filter(menu => menu.tags && menu.tags.includes(requestedCategory) && menu.help && menu.help[0]);
 
         if (categoryCommands.length === 0) {
