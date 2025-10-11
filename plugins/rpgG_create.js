@@ -11,8 +11,8 @@ let handler = async (m, { conn, args }) => {
     let user = global.db.data.users[userId];
     if (!user) return conn.reply(m.chat, 'Kamu belum terdaftar di dalam database.', m);
     
-    if (user.money < 20000000000) {
-        return conn.reply(m.chat, 'Kamu tidak memiliki cukup money untuk membuat guild. Butuh 20.000.000.000 money.', m);
+    if (user.money < 3000000) {
+        return conn.reply(m.chat, 'Kamu tidak memiliki cukup money untuk membuat guild. Butuh 3.000.000 money.', m);
     }
 
     // Inisialisasi basis data pengguna jika belum ada
@@ -48,7 +48,7 @@ let handler = async (m, { conn, args }) => {
             waitingRoom: [], // Menambahkan waiting room guild
         };
         user.guild = guildId;
-        user.money -= 20000000000; // Mengurangi money user setelah membuat guild
+        user.money -= 3000000; // Mengurangi money user setelah membuat guild
         fs.writeFileSync(dbPath, JSON.stringify(global.db.data, null, 2));
         conn.reply(m.chat, `Guild ${guildName} berhasil dibuat.`, m);
     } else {
