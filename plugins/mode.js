@@ -1,10 +1,7 @@
 /*Plugins CJS 
 Bot Status & Mode
 */
-let { totalmem, freemem } = require('os')
 let os = require('os')
-let util = require('util')
-let osu = require('node-os-utils')
 let { performance } = require('perf_hooks')
 let { sizeFormatter } = require('human-readable')
 let format = sizeFormatter({
@@ -16,11 +13,15 @@ let format = sizeFormatter({
 
 let handler = async (m, { conn, prefix }) => {
     let wm = global.wm;
+    let old = performance.now();
     let _uptime = process.uptime() * 1000;
     let uptimex = clockString(_uptime);
     let video = './arona/mode.mp4';
     let modeText = global.opts?.['self'] ? 'Self (Private)' : 'Public';
     let usersCount = Object.keys(global.db?.data?.users || {}).length;
+    const chats = Object.entries(conn.chats).filter(([id, data]) => id && data.isChats);
+    const groupsIn = chats.filter(([id]) => id.endsWith('@g.us'));
+
     let bannedUsersCount = 0;
     if (global.db?.data?.settings && global.db.data.settings[conn.user.jid]) {
         bannedUsersCount = global.db.data.settings[conn.user.jid].bannedUsers?.length || 0;
@@ -30,6 +31,9 @@ let handler = async (m, { conn, prefix }) => {
     if (global.db?.data?.stats) {
         featuresUsedCount = Object.values(global.db.data.stats).reduce((a, b) => (typeof b === 'number' ? a + b : a), 0);
     }
+
+    let neww = performance.now();
+    let speed = neww - old;
 
     const fkontak = {
         key: {
@@ -46,23 +50,30 @@ let handler = async (m, { conn, prefix }) => {
         participant: "0@s.whatsapp.net"
     };
 
-    let tio = `
-╭━━━「 🤖 *STATUS BOT* 🤖 」━━━╮
-│
-│💠 *Mode Bot:* ${modeText}
-│⏱️ *Aktif Selama:* ${uptimex}
-│👥 *Total Pengguna:* ${usersCount} Pengguna
-│🚫 *Diblokir:* ${bannedUsersCount} Pengguna
-│⚙️ *Total Perintah Dicoba:* ${featuresUsedCount} Perintah
-│
-├─◈「 ✨ *INFO* ✨ 」◈─
-│ Aku adalah ${global.namebot}, asisten pribadimu!
-│ Jika tidak ada balasan dalam beberapa saat,
-│ kemungkinan bot sedang istirahat atau
-│ ada pemeliharaan. Mohon bersabar ya! 🙏
-│
-╰━━━━「 ${wm} 」━━━━╯
-    `.trim();
+    let tio = `Halo Sensei! Ini laporan status Bot saat ini! ✨
+
+╭─「 *INFO BOT* 」
+│💠 *Mode:* ${modeText}
+│⏰ *Aktif:* ${uptimex}
+│⚡ *Kecepatan:* ${speed.toFixed(4)} ms
+╰─────────────
+
+╭─「 *STATISTIK* 」
+│👥 *Total Pengguna:* ${usersCount}
+│💬 *Total Chat:* ${chats.length}
+│🏢 *Grup Terdaftar:* ${groupsIn.length}
+│🚫 *Pengguna Diblokir:* ${bannedUsersCount}
+│⚙️ *Total Perintah:* ${featuresUsedCount}
+╰─────────────
+
+╭─「 *SERVER* 」
+│💻 *Platform:* ${os.platform()}
+│💾 *RAM:* ${format(os.totalmem() - os.freemem())} / ${format(os.totalmem())}
+│🎛️ *CPU:* ${os.cpus()[0].model.trim()}
+╰─────────────
+
+Aku adalah *${global.namebot}*, asisten pribadimu!
+Jika tidak ada balasan, mungkin Bot sedang istirahat atau ada pemeliharaan. Mohon bersabar ya! 🙏`.trim();
 
 
     try {
@@ -97,4 +108,3 @@ function clockString(ms) {
     let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60;
     return `${d} Hari ${h} Jam ${m} Menit ${s} Detik`;
 }
-  
