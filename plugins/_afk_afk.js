@@ -27,12 +27,14 @@ let handler = async (m, { text, conn }) => {
   };
 
   let replyText = `
-💤 *AFK MODE* 💤
+💤 *Mode AFK Diaktifkan* 💤
 
-Baiklah, *${senderName}* (@${m.sender.split('@')[0]}), lu sekarang dalam mode AFK.
-${text.trim() ? `📝 *Alasan:* "${text.trim()}"` : '🤔 *Alasan:* _Tidak disebutkan_'}
+Sensei *${senderName}* sekarang sedang istirahat sebentar.
+Aku akan menjaga semuanya selagi Sensei pergi!
 
-Bye!! Jangan balik lagi lu. 👋
+${text.trim() ? `📝 *Alasan:* ${text.trim()}` : '🤔 *Alasan:* _Tidak disebutkan_'}
+
+Sampai jumpa lagi nanti, Sensei! 👋
   `.trim();
 
   await conn.reply(m.chat, replyText, fkontak);
