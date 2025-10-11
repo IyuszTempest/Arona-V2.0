@@ -28,9 +28,9 @@ handler.before = async m => {
   if (user.afk > -1) {
     let afkDuration = new Date() - user.afk;
     await m.reply(`
-🎉 *Selamat Datang Kembali!* 🎉
+🎉 *Selamat Datang Kembali, Sensei!* 🎉
 
-Lu telah berhenti dari mode AFK${user.afkReason ? ` setelah:\n📝 *Alasan:* "${user.afkReason}"` : '.'}
+kamu telah berhenti dari mode AFK${user.afkReason ? ` setelah:\n📝 *Alasan:* "${user.afkReason}"` : '.'}
 😴 *Total Durasi AFK:* ${clockString(afkDuration)}
 
 Semoga hari mu senin terus! ✨
@@ -60,7 +60,7 @@ ${reason ? `💬 *Alasan:* "${reason}"` : '🚫 *Tanpa alasan khusus.*'}
 
 ⏳ *Sudah AFK Selama:* ${clockString(afkDuration)}
 
-Jangan di tag, sampai kembali aktif ya! 🙏
+Jangan tag sensei, sampai kembali aktif ya! 🙏
 `.trim(), null, { quoted: fkontak });
     }
   }
