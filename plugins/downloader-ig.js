@@ -38,27 +38,40 @@ const snapins = async (urlIgPost) => {
 }
 
 let handler = async (m, { conn, args, command }) => {
-    if (!args[0]) throw `Mana URL Instagram nya?\nContoh : .${command} https://www.instagram.com/p/xxxxx/`
-
-    // emoji proses random
-    const emojis = ['⏳', '🔄', '📡', '📥', '🔍', '🌀', '📲']
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
-    m.reply(`${randomEmoji} Sedang memproses, tunggu sebentar...`)
-
-    let { images, videos } = await snapins(args[0])
-
-    if (images.length > 0) {
-        await m.reply(`📷 Terdeteksi ${images.length} foto, akan dikirim...`)
-        for (const img of images) {
-            await conn.sendMessage(m.chat, { image: { url: img } }, { quoted: m })
-        }
+    if (!args[0]) {
+        return conn.reply(m.chat, `Mana URL Instagram nya, Sensei?\nContoh : .${command} https://www.instagram.com/p/xxxxx/`, m);
     }
 
-    if (videos.length > 0) {
-        await m.reply(`🎥 Terdeteksi ${videos.length} video, akan dikirim...`)
-        for (const vid of videos) {
-            await conn.sendMessage(m.chat, { video: { url: vid } }, { quoted: m })
+    try {
+        // emoji proses random
+        const emojis = ['⏳', '🔄', '📡', '📥', '🔍', '🌀', '📲'];
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        await conn.reply(m.chat, `${randomEmoji} Sedang memproses, tunggu sebentar ya Sensei...`, m);
+
+        let { images, videos } = await snapins(args[0]);
+
+        if (images.length === 0 && videos.length === 0) {
+            return conn.reply(m.chat, 'Maaf Sensei, Arona tidak menemukan gambar atau video dari link itu. Mungkin link-nya salah atau postingannya privat?', m);
         }
+
+        if (images.length > 0) {
+            await conn.reply(m.chat, `📷 Arona menemukan ${images.length} foto, akan segera dikirim...`, m);
+            for (const img of images) {
+                await conn.sendMessage(m.chat, { image: { url: img } }, { quoted: m });
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Jeda 1 detik
+            }
+        }
+
+        if (videos.length > 0) {
+            await conn.reply(m.chat, `🎥 Arona menemukan ${videos.length} video, akan segera dikirim...`, m);
+            for (const vid of videos) {
+                await conn.sendMessage(m.chat, { video: { url: vid } }, { quoted: m });
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Jeda 1 detik
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        await conn.reply(m.chat, `Waduh, sepertinya ada masalah, Sensei. Gagal mengambil data: ${e.message}`, m);
     }
 }
 
