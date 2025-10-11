@@ -81,8 +81,8 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
   }
 };
 
-handler.help = ['whatmusic'];
-handler.tags = ['internet'];
-handler.command = /^whatmusic$/i;
+handler.help = ['whatmusic2'];
+handler.tags = ['internet', 'tools'];
+handler.command = /^whatmusic2$/i;
 
 module.exports = handler;
