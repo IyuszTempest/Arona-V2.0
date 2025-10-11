@@ -2,6 +2,22 @@ const os = require('os')
 const axios = require('axios')
 
 let handler = async (m, { conn }) => {
+  // Definisi fkontak
+  const fkontak = {
+      key: {
+          participants: "0@s.whatsapp.net",
+          remoteJid: "status@broadcast",
+          fromMe: false,
+          id: "Halo"
+      },
+      message: {
+          contactMessage: {
+              vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+          }
+      },
+      participant: "0@s.whatsapp.net"
+  };
+  await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
   try {
     const uptimeSec = os.uptime()
     const botUptimeSec = process.uptime()
@@ -42,26 +58,38 @@ let handler = async (m, { conn }) => {
     const publicIP = await axios.get('https://api.ipify.org?format=json')
     const ip = publicIP.data.ip || 'Tidak ditemukan'
 
-    const msg = `
-🖥️ *Informasi VPS & Bot*
+    const msg = `Halo! Ini laporan status VPS yang digunakan bot ini! ✨
 
-📆 VPS aktif sejak: ${bootTime.toLocaleString('en-GB')}
-⏱️ Uptime VPS: ${formatTime(uptimeSec)}
-🤖 Runtime Bot: ${formatTime(botUptimeSec)}
-🌐 IP ${ip}
-🏙️ Region: Singapore
+╭─「 *INFO SERVER* 」
+│ 💻 *Platform:* ${os.platform()}
+│ 📆 *Aktif Sejak:* ${bootTime.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+│ ⏱️ *Uptime VPS:* ${formatTime(uptimeSec)}
+│ 🤖 *Runtime Bot:* ${formatTime(botUptimeSec)}
+╰─────────────
 
-🧠 CPU: ${cpuModel}
-🔢 Core: ${cpuCores} Core
+╭─「 *JARINGAN* 」
+│ 🌐 *Alamat IP:* ${ip}
+│ 🏙️ *Region:* Singapore
+╰─────────────
 
-📦 RAM: ${formatBytes(usedMem)} GB / ${formatBytes(totalMem)} GB
-`.trim()
+╭─「 *CPU* 」
+│ 🧠 *Model:* ${cpuModel}
+│ 🔢 *Total Core:* ${cpuCores} Core
+╰─────────────
 
-    await conn.reply(m.chat, msg, m)
+╭─「 *MEMORI* 」
+│ 💾 *RAM Terpakai:* ${formatBytes(usedMem)} GB / ${formatBytes(totalMem)} GB
+╰─────────────
+
+Semua sistem berjalan dengan normal!`.trim()
+
+    await conn.reply(m.chat, msg, fkontak)
+    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
   } catch (e) {
     console.error(e)
-    m.reply('❌ Gagal mengambil data VPS.')
+    await conn.reply(m.chat, '❌ Waduh, Sensei! Gagal mengambil data VPS.', fkontak)
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 }
 
