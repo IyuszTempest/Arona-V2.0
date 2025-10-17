@@ -71,7 +71,7 @@ let handler = async (m, { conn, args }) => {
 
     try {
         if (!args[0]) {
-            return conn.reply(m.chat, 'Mau cari lagu apa? Tinggal ketik judul lagunya!\nContoh: gradation hanatan', fkontak);
+            return conn.reply(m.chat, 'Mau cari lagu apa? Tinggal ketik artis dan judul lagunya!\nContoh: hanatan gradation', fkontak);
         }
 
         const query = args.join(' ');
