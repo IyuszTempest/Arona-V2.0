@@ -1,6 +1,6 @@
 {
     "name": "Arona MD",
-    "version": "14",
+    "version": "15",
     "description": "Lightweight WhatsApp Bot",
     "depecrated": false,
     "main": "index.js",
