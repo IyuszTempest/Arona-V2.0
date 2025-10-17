@@ -757,8 +757,9 @@ module.exports = {
                         }
                         // --- BARIS INI YANG DIPERBAIKI ---
                         if (m.limit) {
-                            m.reply(`${m.limit} Limit terpakai`)
-                        }
+							let limitUsed = (typeof m.limit === 'boolean' && m.limit) ? 1 : m.limit;
+							m.reply(`-${limitUsed} Limit terpakai`);
+						}
                     }
                     break
                 }
