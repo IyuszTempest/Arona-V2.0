@@ -1,147 +1,72 @@
+/*
+ * Plugins CJS
+ * YouTube MP4 Downloader (Khusus Link - Privatezia API)
+ */
+
 const axios = require('axios');
-const FormData = require('form-data');
-class Success {
-constructor(data) {
-this.success = true;
-this.data = data;
+
+async function downloadYtMp4FromLink(youtubeUrl) {
+    const apiUrl = `https://api.privatezia.biz.id/api/downloader/ytmp4?url=${encodeURIComponent(youtubeUrl)}`;
+    try {
+        const { data } = await axios.get(apiUrl);
+        if (!data.status || !data.result || !data.result.downloadUrl) {
+            throw new Error(data.message || 'API tidak mengembalikan link download MP4 yang valid.');
+        }
+        return data.result;
+    } catch (error) {
+        console.error("Error calling API:", error);
+        throw new Error(`Gagal menghubungi API: ${error.message}`);
+    }
 }
+
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+    const fkontak = {
+        key: {
+            participants: "0@s.whatsapp.net",
+            remoteJid: "status@broadcast",
+            fromMe: false,
+            id: "Halo"
+        },
+        message: {
+            contactMessage: {
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+            }
+        },
+        participant: "0@s.whatsapp.net"
+    };
+
+    const youtubeLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|)([\w-]{11})(?:\S+)?/;
+    if (!args[0] || !youtubeLinkRegex.test(args[0])) {
+        return conn.reply(m.chat, `Masukkan link YouTube yang valid\n\n*Contoh:*\n${usedPrefix + command} https://www.youtube.com/watch?v=xxxxxxxxxxx`, fkontak);
+    }
+    const youtubeUrl = args[0];
+
+    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
+    await conn.reply(m.chat, '_Wait..._', fkontak);
+
+    try {
+        const downloadResult = await downloadYtMp4FromLink(youtubeUrl);
+
+        const finalTitle = downloadResult.title || 'Judul Tidak Diketahui';
+        const videoDownloadUrl = downloadResult.downloadUrl;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: videoDownloadUrl },
+            mimetype: 'video/mp4',
+            fileName: `${finalTitle}.mp4`,
+            caption: `🎥 *YouTube MP4 Downloader* 🎉\n\n📌 *Judul:* ${finalTitle}\n✨ *Kualitas:* ${downloadResult.quality || 'N/A'}\n🔗 *Link Asli:* ${youtubeUrl}`,
+        }, { quoted: fkontak });
+
+    } catch (err) {
+        console.error('❌ Error saat proses YouTube MP4 (Link):', err);
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+        conn.reply(m.chat, `Aduh, ada error nih: ${err.message}. Pastikan link-nya bener ya.`, fkontak);
+    }
 }
-class ErrorResponse {
-constructor(error) {
-this.success = false;
-this.error = error;
-}
-}
-const ytdl = async (url, quality = "720") => {
-try {
-if (!url || !url.includes('youtube.com') && !url.includes('youtu.be')) {
-return new ErrorResponse({
-message: "URL YouTube tidak valid!"
-});
-}
-const validQuality = {
-"480": 480,
-"1080": 1080,
-"720": 720,
-"360": 360,
-"audio": "mp3",
-};
-if (!Object.keys(validQuality).includes(quality)) {
-return new ErrorResponse({
-message: "Quality tidak valid!",
-availableQuality: Object.keys(validQuality)
-});
-}
-const qualitys = validQuality[quality];
-const { data: firstRequest } = await axios.get(
-`https://p.oceansaver.in/ajax/download.php?button=1&start=1&end=1&format=${qualitys}&iframe_source=https://allinonetools.com/&url=${encodeURIComponent(url)}`,
-{
-timeout: 30000,
-headers: {
-'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-}
-}
-);
-if (!firstRequest || !firstRequest.progress_url) {
-return new ErrorResponse({
-message: "Gagal memulai proses download"
-});
-}
-const { progress_url } = firstRequest;
-let metadata = {
-image: firstRequest.info?.image || "",
-title: firstRequest.info?.title || "Unknown Title",
-downloadUrl: "",
-quality: quality,
-type: quality === "audio" ? "mp3" : "mp4"
-};
-let datas;
-let attempts = 0;
-const maxAttempts = 40;
-do {
-if (attempts >= maxAttempts) {
-return new ErrorResponse({
-message: "Timeout: Proses download terlalu lama, coba lagi"
-});
-}
-await new Promise(resolve => setTimeout(resolve, 3000));
-try {
-const { data } = await axios.get(progress_url, {
-timeout: 15000,
-headers: {
-'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-}
-});
-datas = data;
-} catch (pollError) {
-console.log(`Polling attempt ${attempts + 1} failed, retrying...`);
-}
-attempts++;
-} while (!datas?.download_url);
-if (!datas.download_url) {
-return new ErrorResponse({
-message: "Gagal mendapatkan URL download"
-});
-}
-metadata.downloadUrl = datas.download_url;
-return new Success(metadata);
-} catch (error) {
-if (error.code === 'ECONNABORTED') {
-return new ErrorResponse({
-message: "Request timeout, coba lagi nanti"
-});
-}
-return new ErrorResponse({
-message: error.response?.data?.message || error.message || "Gagal download video"
-});
-}
-};
-async function handler(m, { text, conn }) {
-if (!text) return m.reply("📌 *Contoh penggunaan:*\n.ytmp4 <url> [resolusi]\nContoh: .ytmp4 https://youtu.be/abc123 720");
-const args = text.split(" ");
-const url = args[0];
-const quality = args[1]?.replace(/p$/, '') || "480";
-const isValidUrl = url.startsWith("http") && (url.includes("youtube.com") || url.includes("youtu.be"));
-if (!isValidUrl) return m.reply("❌ *Masukkan URL YouTube yang valid.*");
-const maxResolution = 1080;
-if (parseInt(quality) > maxResolution) {
-return m.reply(`⚠️ *Resolusi maksimal yang diperbolehkan adalah ${maxResolution}p.*`);
-}
-const validQualities = ["360", "480", "720", "1080"];
-if (!validQualities.includes(quality)) {
-return m.reply(`❌ *Resolusi tidak valid. Gunakan: ${validQualities.join(", ")}*`);
-}
-try {
-m.reply("⏳ *Mengambil data, mohon tunggu...*");
-const result = await ytdl(url, quality);
-if (!result.success) {
-return m.reply(`❌ *${result.error.message}*`);
-}
-const { title, image, downloadUrl } = result.data;
-const caption = `
-🎬 *Judul:* ${title}
-📥 *Resolusi:* ${quality}p
-`.trim();
-if (image) {
-await conn.sendMessage(m.chat, {
-image: { url: image },
-caption,
-mentions: [m.sender]
-}, { quoted: m });
-}
-m.reply(`📥 *Mengunduh video dalam resolusi ${quality}p...*`);
-await conn.sendMessage(m.chat, {
-video: { url: downloadUrl, mimetype: 'video/mp4' },
-caption,
-mentions: [m.sender]
-}, { quoted: m });
-} catch (err) {
-m.reply("❌ *Terjadi kesalahan saat mengambil data.*");
-}
-}
-handler.command = /^(ytmp4)$/i;
-handler.help = ["ytmp4 *<url>* *[resolusi]*"];
-handler.tags = ["downloader"];
+
+handler.command = /^ytmp4$/i;
+handler.tags = ['downloader'];
+handler.help = ['ytmp4'];
 handler.limit = true;
-handler.premium = false;
+
 module.exports = handler;
