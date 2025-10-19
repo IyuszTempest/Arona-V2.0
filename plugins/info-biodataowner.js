@@ -19,7 +19,7 @@ const handler = async (m, { conn }) => {
 ├ 🙏 Agama : ${global.agamaowner}
 ├ 🎮 Game Fav : ${global.gamefav}
 ├ 📺 Anime Fav : ${global.animefav}
-├ 💘 Waifu : ${global.waifuowner}
+├ 💘 Waifu/Husbu : ${global.waifuowner}
 ├ 🎨 Hobi : ${global.hobiowner}
 │
 ├─〔 SOSIAL MEDIA 〕
