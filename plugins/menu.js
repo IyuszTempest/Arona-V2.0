@@ -35,34 +35,35 @@ const allTags = {
 };
 
 const defaultMenu = {
-    before: `
-Halo *%name*! ✨ Selamat datang di *${global.namebot}*.
+    before: `Hai *%name*! ✨
+Aku, *${global.namebot}*, siap membantu!
+┌───「 👤 *STATUS KAMU* 」
+│ ⚜️ *Level:* %level
+│ ⚡ *Exp:* %exp
+│ 칭 *Role:* %role
+│ 👑 *Gelar:* %gelar
+│ 🎌 *Status Wibu:* %wibustatus
+│ 💖 *Waifu:* %waifu
+│ 💙 *Husbu:* %husbu
+└──────────────
 
-╭─「 *STATUS KAMU* 」
-│ Level: *%level*
-│ Exp: *%exp*
-│ Role: *%role*
-╰─────────────
-
-╭─「 *INFO BOT* 」
-│ Uptime: *%uptime*
-│ Tanggal: *%date*
-│ Waktu: *%time*
-╰─────────────
-
-Berikut adalah menu-menu spesial yang sudah aku siapin untuk kamu!
-`,
-    header: '╭─「 *%category* 」',
-    body: '│ • %cmd %islimit %isPremium',
-    footer: '╰─────────────',
-    after: `Powered by ${global.wm}`
-    
+┌───「 🤖 *INFO BOT* 」
+│ 🕒 *Uptime:* %uptime
+│ 📆 *Tanggal:* %date
+│ ⏰ *Waktu:* %time
+└──────────────
+Ini daftar perintah yang bisa kamu gunakan.`,
+    header: '┌─「 *%category* 」',
+    body: '│ 👾 %cmd %islimit %isPremium',
+    footer: '└────',
+    after: `
+${global.wm}`
 }; 
 
 let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
     try {
         let packageInfo = JSON.parse(await fs.promises.readFile(path.join(__dirname, '../package.json')).catch(_ => '{}'))
-        let { exp, limit, level, role } = global.db.data.users[m.sender]
+        let { exp, limit, level, role, husbu, waifu } = global.db.data.users[m.sender]
         let { min, xp: userXP, max } = levelling.xpRange(level, global.multiplier)
         let name = `@${m.sender.split`@`[0]}`
         let requestedCategory = args[0] ? args[0].toLowerCase() : '';
@@ -73,6 +74,35 @@ let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
         let time = d.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric', second: 'numeric' })
         let _uptime = process.uptime() * 1000
         let uptime = clockString(_uptime)
+
+        // --- Logika Gelar & Status Wibu ---
+        let gelar = 'Rakyat Jelata';
+        const isOwner = global.owner.includes(m.sender.replace('@s.whatsapp.net', ''));
+        if (isOwner) {
+            gelar = 'Raja Iblis';
+        } else if (level >= 500) {
+            gelar = 'Raja/Ratu';
+        } else if (level >= 250) {
+            gelar = 'Grand Duke';
+        } else if (level >= 100) {
+            gelar = 'Duke';
+        } else if (level >= 85) {
+            gelar = 'Count';
+        } else if (level >= 65) {
+            gelar = 'Baron';
+        } else if (level >= 50) {
+            gelar = 'Kesatria';
+        } else if (level >= 15) {
+            gelar = 'Pelayan';
+        }
+
+        let wibustatus = 'Tidak Wibu';
+        if ((husbu && husbu !== 'Belum Di Set') || (waifu && waifu !== 'Belum Di Set')) {
+            wibustatus = 'Wibu Sejati';
+        }
+        // --- Akhir Logika ---
+
+
 
         const fkontak = {
             key: {
@@ -100,25 +130,25 @@ let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
                 enabled: !plugin.disabled,
             }
         })
-        let replaceVars = { '%': '%', p: _p, uptime, name, date, time, exp, limit, level, role };
+        let replaceVars = { '%': '%', p: _p, uptime, name, date, time, exp, limit, level, role, gelar, wibustatus, waifu: waifu || 'Belum di set', husbu: husbu || 'Belum di set' };
 
         if (!requestedCategory || requestedCategory === 'all') {
             let menuList = `${defaultMenu.before}\n`;
-            menuList += `╭─「 *MENU SPESIAL* 」\n`;
-            menuList += `│ • ⭐ *${_p}menupremium*\n`;
-            menuList += `│ • 🌸 *${_p}menuanime*\n`;
-            menuList += `│ • ⚔️ *${_p}menurpg*\n`;
-            menuList += `│ • 🔞 *${_p}menunsfw*\n`;
-            menuList += `│ • 🛠️ *${_p}menutools*\n`;
-            menuList += `│ • 🤖 *${_p}menuai*\n`;
-            menuList += `│ • 📥 *${_p}menudownloader*\n`;
-            menuList += `╰─────────────\n\n`;
+            menuList += `\n┌─「 🌟 *MENU SPESIAL* 」\n`;
+            menuList += `│ • ⭐ *.menupremium*\n`;
+            menuList += `│ • 🌸 *.menuanime*\n`;
+            menuList += `│ • ⚔️ *.menurpg*\n`;
+            menuList += `│ • 🔞 *.menunsfw*\n`;
+            menuList += `│ • 🛠️ *.menutools*\n`;
+            menuList += `│ • 🤖 *.menuai*\n`;
+            menuList += `│ • 📥 *.menudownloader*\n`;
+            menuList += `└──────────────\n\n`;
             
-            menuList += `╭─「 *MENU LAINNYA* 」\n`;
+            menuList += `┌─「 📚 *MENU LAINNYA* 」\n`;
 
             for (let tag of arrayMenu) {
-                if (tag && tag !== 'all' && tag !== '' && allTags[tag] && !['rpg', 'rpgG', 'nsfw', 'tools', 'ai', 'downloader', 'anime', 'premium'].includes(tag)) {
-                    menuList += `│ • *${_p}menu* ${tag}\n`;
+                if (tag && tag !== 'all' && tag !== '' && allTags[tag] && !['rpg', 'rpgG', 'nsfw', 'tools', 'sticker', 'ai', 'downloader', 'anime', 'premium'].includes(tag)) {
+                    menuList += `│ 📁 *${_p}menu* ${tag}\n`;
                 }
             }
             menuList += `╰─────────────\n\n${defaultMenu.after.replace(/<category>/g, 'Semua Menu')}`;
@@ -145,29 +175,29 @@ let handler = async (m, { conn, usedPrefix: _p, args = [], command }) => {
         }
 
         if (requestedCategory === 'premium') {
-            return conn.reply(m.chat, `Untuk melihat daftar menu premium, gunakan command *${_p}menupremium* ya! ⭐`, fkontak);
+            return conn.reply(m.chat, `⭐ Untuk melihat daftar menu premium, gunakan command *${_p}menupremium* ya!`, fkontak);
         }
         if (requestedCategory === 'anime') {
-            return conn.reply(m.chat, `Untuk semua menu anime, sekarang pakai command *${_p}menuanime* ya! 🌸`, fkontak);
+            return conn.reply(m.chat, `🌸 Untuk semua menu anime, sekarang pakai command *${_p}menuanime* ya!`, fkontak);
         }
         if (requestedCategory === 'rpg' || requestedCategory === 'rpgg') {
-            return conn.reply(m.chat, `Untuk menu RPG, sekarang pakai command *${_p}menurpg* ya! 😉`, fkontak);
+            return conn.reply(m.chat, `⚔️ Untuk menu RPG, sekarang pakai command *${_p}menurpg* ya!`, fkontak);
         }
         if (requestedCategory === 'nsfw') {
-            return conn.reply(m.chat, `Ehem! 🔞 Untuk menu "spesial" itu, ketik *${_p}menunsfw* ya.`, fkontak);
+            return conn.reply(m.chat, `Ehem! 🔞 Untuk menu "spesial" itu, ketik *${_p}menunsfw* ya, Sensei.`, fkontak);
         }
         if (requestedCategory === 'tools' || requestedCategory === 'sticker') {
-             return conn.reply(m.chat, `Untuk menu tools dan alat bantu, sekarang pakai command *${_p}menutools* ya! 🛠️`, fkontak);
+             return conn.reply(m.chat, `🛠️ Untuk menu tools dan stiker, sekarang pakai command *${_p}menutools* ya!`, fkontak);
         }
         if (requestedCategory === 'ai') {
-            return conn.reply(m.chat, `Untuk semua fitur AI, sekarang pakai command *${_p}menuai* ya! 🤖`, fkontak);
+            return conn.reply(m.chat, `🤖 Untuk semua fitur AI, sekarang pakai command *${_p}menuai* ya, Sensei!`, fkontak);
         }
         if (requestedCategory === 'downloader') {
-            return conn.reply(m.chat, `Semua command downloader sekarang ada di *${_p}menudownloader* ya! 📥`, fkontak);
+            return conn.reply(m.chat, `📥 Semua command downloader sekarang ada di *${_p}menudownloader* ya!`, fkontak);
         }
 
         if (!allTags[requestedCategory]) {
-            return conn.reply(m.chat, `Menu "${requestedCategory}" tidak tersedia.\nKetik *${_p}menu* untuk daftar semua menu.`, fkontak);
+            return conn.reply(m.chat, `🤔 Sensei, menu "${requestedCategory}" tidak ada dalam daftar.\nKetik *${_p}menu* untuk melihat semua kategori yang tersedia ya.`, fkontak);
         }
 
         let menuCategoryContent = defaultMenu.before + '\n\n';
