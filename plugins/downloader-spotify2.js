@@ -95,7 +95,7 @@ let handler = async (m, { conn, args }) => {
         }).then(res => res.data);
        
         await conn.sendMessage(m.chat, {
-            audio: audioBuffer, 
+            audio: audioBuffer,
             mimetype: 'audio/mpeg',
             fileName: ${searchResult.title}.mp3,
             contextInfo: {
