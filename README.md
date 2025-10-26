@@ -1,7 +1,7 @@
-# ✨ Arona MD ✨
+# ✨ Arona V2.0 ✨
 _Bot WhatsApp Multi-platform dengan Teknologi AI & Fitur Lengkap_
 
-Arona MD adalah bot WhatsApp berbasis Node.js yang dirancang untuk mempermudah berbagai aktivitas di grup maupun chat pribadi. Bot ini dibangun dengan kombinasi **scraper** dan **Rest API**, menggunakan **tipe plugin CJS**.
+Arona V2.0 adalah bot WhatsApp berbasis Node.js yang dirancang untuk mempermudah berbagai aktivitas di grup maupun chat pribadi. Bot ini dibangun dengan kombinasi **scraper** dan **Rest API**, menggunakan **tipe plugin CJS**.
 
 ## 🚀 Fitur Utama
 
@@ -16,6 +16,7 @@ Arona MD adalah bot WhatsApp berbasis Node.js yang dirancang untuk mempermudah b
 -   ✅ **Type Plugins CJS**
 -   ✅ **Sudah ada lid**
 -   ✨ **Beberapa fitur menggunakan rest api pribadi (Euphy API by IyuszTempest)**
+-   ✨ **Pengguna bot bisa lapor fitur error via bot dan laporan akan terkirim ke nomer owner, contoh: .laporerror fitur hd rusak nih**
 
 ![Arona](https://files.catbox.moe/mskrgn.png)
 
