@@ -23,11 +23,11 @@ let handler = async (m, { conn }) => {
 *✨ Script Bot Arona* ✨
 
 Halo *${ye}*!
-Bot ini menggunakan base script *Arona MD V15*, yang dikembangkan oleh *IyuszTempest*. Script ini menggunakan base dari Botcahx!!
+Bot ini menggunakan base script *Arona V2.0*, yang dikembangkan oleh *IyuszTempest*. Script ini menggunakan base dari Botcahx!!
 
 _Repository_ utama bisa dicek di sini:
-*➤ Repository Arona MD:*
-🔗 https://github.com/IyuszTempest/Arona-MD
+*➤ Repository Arona:*
+🔗 https://github.com/IyuszTempest/Arona-V2.0.git
 
 *➤ Base Original:*
 🔗 https://github.com/BOTCAHX/RTXZY-MD
