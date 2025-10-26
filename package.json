@@ -1,6 +1,6 @@
 {
-    "name": "Arona MD",
-    "version": "15",
+    "name": "arona",
+    "version": "V2.0",
     "description": "Lightweight WhatsApp Bot",
     "depecrated": false,
     "main": "index.js",
@@ -26,16 +26,16 @@
         "botcahx",
         "baileys"
     ],
-    "homepage": "https://github.com/IyuszTempest/Arona-MD",
+    "homepage": "https://github.com/IyuszTempest/Arona-V2.0.git",
     "author": {
         "name": "IyuszTempest"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/IyuszTempest/Arona-MD.git"
+        "url": "https://github.com/IyuszTempest/Arona-V2.0.git"
     },
     "bugs": {
-        "url": "https://github.com/IyuszTempest/Arona-MD/issues"
+        "url": "https://github.com/IyuszTempest/Arona-V2.0.git"
     },
     "license": "MIT",
     "dependencies": {
