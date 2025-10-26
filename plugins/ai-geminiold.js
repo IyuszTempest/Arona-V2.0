@@ -66,7 +66,7 @@ async function saveTempFile(buffer, mimeType, fileType = 'audio') {
       }
   }
   
-  const filename = `${fileType}_${Date.now()}_${Math.floor(Math.random() * 10000)}.${extension}`;
+  const filename = ${fileType}_${Date.now()}_${Math.floor(Math.random() * 10000)}.${extension};
   const filepath = path.join(tempDir, filename);
   
   const readable = new Readable();
@@ -120,7 +120,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
       },
       message: {
           contactMessage: {
-              vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+              vcard: BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
           }
       },
       participant: "0@s.whatsapp.net"
@@ -339,78 +339,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     
   } catch (e) {
     console.error(e);
-    conn.reply(m.chat, `error coks: ${e.message}`, fkontak); // Pakai fkontak
-  }
-};
-
-handler.help = ["geminiold"].map(a => a + " <text>");
-handler.help.push("resetgeminiold");
-handler.tags = ["ai","premium"];
-handler.command = /^(geminiold|resetgeminiold)$/i;
-handler.limit = true;
-handler.register = true;
-handler.premium = true;
-
-module.exports = handler
- 
-          // No need to cleanup here, it's done in finally block
-        } finally {
-          cleanupTempFile(filepath);
-        }
-      }
-    }
-    else if (
-      mime.startsWith('application/') || 
-      mime.startsWith('text/') ||
-      mime === 'application/pdf' ||
-      mime === 'application/msword' ||
-      mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-      mime === 'application/vnd.ms-excel' ||
-      mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      mime === 'application/vnd.ms-powerpoint' ||
-      mime === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
-      mime === 'text/plain' ||
-      mime === 'text/csv'
-    ) {
-      await conn.reply(m.chat, "Memproses dokumennya, mohon bersabar ya masbro...", fkontak); // Pakai fkontak
-      
-      let media = await q.download();
-      const { filepath, filename } = await saveTempFile(media, mime, 'document');
-      
-      try {
-        const response = await processAudioOrDocument(filepath, mime, text);
-        
-        if (!response) throw new Error("Response gak valid dari API");
-        
-        await conn.sendMessage(m.chat, {
-          text: response,
-          contextInfo: {
-            externalAdReply: {
-              title: 'GEMINI-PRO / DOCUMENT',
-              thumbnailUrl: 'https://telegra.ph/file/4bae3d5130aabcbe94588.jpg',
-              sourceUrl: 'https://gemini.google.com',
-              mediaType: 1,
-              renderLargerThumbnail: true
-            }
-          }
-        }, { quoted: fkontak }); // Pakai fkontak
-      } finally {
-        cleanupTempFile(filepath);
-      }
-    } else {
-      return conn.reply(m.chat, "Format file gak didukung. Gunakan text, gambar, audio, atau dokumen.", fkontak); // Pakai fkontak
-    }
-    
-    // Reset sesi abis 30 menit
-    setTimeout(() => {
-      if (chatSessions.has(userId)) {
-        chatSessions.delete(userId);
-      }
-    }, 30 * 60 * 1000);
-    
-  } catch (e) {
-    console.error(e);
-    conn.reply(m.chat, error coks: ${e.message}, fkontak); // Pakai fkontak
+    conn.reply(m.chat, error coks: ${e.message}, fkontak);
   }
 };
 
