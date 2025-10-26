@@ -4,7 +4,37 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const express = require('express');
+const chalk = require('chalk');
 const app = express();
+
+// --- Logger Kustom untuk Tampilan yang Lebih Baik ---
+const log = (text, color = 'white') => {
+    console.log(chalk.gray('┌─' + '─'.repeat(17)));
+    console.log(chalk[color](`│ [${new Date().toLocaleTimeString()}]`), chalk[color].bold(text));
+    console.log(chalk.gray('└─' + '─'.repeat(17)));
+};
+const info = (text) => {
+    console.log(chalk.cyan('┌─[') + chalk.cyan.bold('INFO') + chalk.cyan(']───────────'));
+    console.log(chalk.cyan(`│ [${new Date().toLocaleTimeString()}]`), chalk.cyan.bold(text));
+    console.log(chalk.cyan('└' + '─'.repeat(19)));
+};
+const warn = (text) => {
+    console.log(chalk.yellow('┌─[') + chalk.yellow.bold('WARNING') + chalk.yellow(']────────'));
+    console.log(chalk.yellow(`│ [${new Date().toLocaleTimeString()}]`), chalk.yellow.bold(text));
+    console.log(chalk.yellow('└' + '─'.repeat(19)));
+};
+const error = (text) => {
+    console.log(chalk.red('┌─[') + chalk.red.bold('ERROR') + chalk.red(']──────────'));
+    console.log(chalk.red(`│ [${new Date().toLocaleTimeString()}]`), chalk.red.bold(text));
+    console.log(chalk.red('└' + '─'.repeat(19)));
+};
+const success = (text) => {
+    console.log(chalk.green('┌─[') + chalk.green.bold('SUCCESS') + chalk.green(']────────'));
+    console.log(chalk.green(`│ [${new Date().toLocaleTimeString()}]`), chalk.green.bold(text));
+    console.log(chalk.green('└' + '─'.repeat(19)));
+};
+// ---
+
 
 // Express.js 
 const ports = [4000, 3000, 5000, 8000, 8080, 4444];
@@ -25,13 +55,13 @@ async function startServer() {
   const isPortAvailable = await checkPort(port);
 
   if (isPortAvailable) {
-    console.log('\x1b[33m%s\x1b[0m', `🌐 Port ${port} is open`);
+    info(`🌐 Port ${port} is open and ready.`);
     app.get('/', (req, res) => {
       res.setHeader('Content-Type', 'application/json');
       const data = {
         status: 'true',
-        message: 'Bot Successfully Activated!',
-        author: 'BOTCAHX'
+        message: 'Bot Sudah Aktif!',
+        author: 'IyuszTempest'
       };
       const result = {
         response: data
@@ -39,11 +69,11 @@ async function startServer() {
       res.send(JSON.stringify(result, null, 2));
     });
   } else {
-    console.log(`Port ${port} is already in use. Trying another port...`);
+    warn(`Port ${port} is already in use. Trying another port...`);
     availablePortIndex++;
 
     if (availablePortIndex >= ports.length) {
-      console.log('No more available ports. Exiting...');
+      error('No more available ports. Exiting...');
       process.exit(1);
     } else {
       ports[availablePortIndex] = parseInt(port) + 1;
@@ -66,7 +96,7 @@ function start(file) {
   });
 
   p.on("message", (data) => {
-    console.log('\x1b[36m%s\x1b[0m', `🟢 RECEIVED ${data}`);
+    success(`🟢 RECEIVED: ${data}`);
     switch (data) {
       case "reset":
         p.kill();
@@ -81,14 +111,13 @@ function start(file) {
 
   p.on("exit", (code) => {
     isRunning = false;
-    console.error('\x1b[31m%s\x1b[0m', `Exited with code: ${code}`);
-    start('main.js');
+    error(`Exited with code: ${code}`);
 
-    if (code === 0) return;
+    if (code === 0) return; // Jangan restart jika keluar secara normal
 
     fs.watchFile(args[0], () => {
       fs.unwatchFile(args[0]);
-	  console.error('\x1b[31m%s\x1b[0m', `File ${args[0]} has been modified. Script will restart...`);
+	  warn(`File ${args[0]} has been modified. Restarting script...`);
       start("main.js");
     });
   });
@@ -97,33 +126,38 @@ function start(file) {
     console.error('\x1b[31m%s\x1b[0m', `Error: ${err}`);
     p.kill();
     isRunning = false;
-    console.error('\x1b[31m%s\x1b[0m', `Error occurred. Script will restart...`);
+    error(`An error occurred. Restarting script...`);
     start("main.js");
   });
+
+  // --- Tampilkan Info Sistem dalam Kotak ---
+  const ramInGB = os.totalmem() / (1024 * 1024 * 1024);
+  const freeRamInGB = os.freemem() / (1024 * 1024 * 1024);
+  const sysInfo = [
+      { text: `🖥️  ${os.type()}, ${os.release()} - ${os.arch()}`, color: 'cyan' },
+      { text: `💾  Total RAM: ${ramInGB.toFixed(2)} GB`, color: 'green' },
+      { text: `💽  Free RAM: ${freeRamInGB.toFixed(2)} GB`, color: 'yellow' },
+      { text: `📃 Script rename By IyuszTempest`, color: 'magenta' },
+      { text: `🔗 Base Ori: https://github.com/BOTCAHX/RTXZY-MD`, color: 'blue' }
+  ];
+  const boxWidth = Math.max(...sysInfo.map(line => line.text.length)) + 4;
+  const rainbow = ['red', 'yellow', 'green', 'blue', 'magenta'];
+  console.log(chalk.magenta('┌' + '─'.repeat(boxWidth) + '┐'));
+  sysInfo.forEach((line, index) => {
+      console.log(chalk.magenta('│ ') + chalk[rainbow[index % rainbow.length]].bold(line.text.padEnd(boxWidth - 3)) + chalk.magenta('│'));
+  });
+  console.log(chalk.magenta('└' + '─'.repeat(boxWidth) + '┘'));
+  // ---
 
   const pluginsFolder = path.join(__dirname, "plugins");
 
   fs.readdir(pluginsFolder, (err, files) => {
     if (err) {
-      console.error('\x1b[31m%s\x1b[0m', `Error reading plugins folder: ${err}`);
+      error(`Error reading plugins folder: ${err}`);
       return;
     }
-    console.log('\x1b[33m%s\x1b[0m', `🟡 Found ${files.length} plugins in folder ${pluginsFolder}`);
-    try {
-      require.resolve('@adiwajshing/baileys');
-      console.log('\x1b[33m%s\x1b[0m', `🟡 Baileys library version ${require('@adiwajshing/baileys/package.json').version} is installed`);
-    } catch (e) {
-      console.error('\x1b[31m%s\x1b[0m', `❌ Baileys library is not installed`);
-    }
+    info(`Found ${files.length} plugins in folder ${pluginsFolder}`);
   });
-
-  console.log(`🖥️ \x1b[33m${os.type()}\x1b[0m, \x1b[33m${os.release()}\x1b[0m - \x1b[33m${os.arch()}\x1b[0m`);
-  const ramInGB = os.totalmem() / (1024 * 1024 * 1024);
-  console.log(`💾 \x1b[33mTotal RAM: ${ramInGB.toFixed(2)} GB\x1b[0m`);
-  const freeRamInGB = os.freemem() / (1024 * 1024 * 1024);
-  console.log(`💽 \x1b[33mFree RAM: ${freeRamInGB.toFixed(2)} GB\x1b[0m`);
-  console.log('\x1b[33m%s\x1b[0m', `📃 Script by BOTCAHX`);
-  console.log('\x1b[33m%s\x1b[0m', `🔗 Github: https://github.com/BOTCAHX/RTXZY-MD`);	
 
   setInterval(() => {}, 1000);
 }
@@ -133,17 +167,16 @@ start("main.js");
 const tmpDir = './tmp';
   if (!fs.existsSync(tmpDir)) {
     fs.mkdirSync(tmpDir);
-    console.log('\x1b[33m%s\x1b[0m', `📁 Created directory ${tmpDir}`);
+    info(`📁 Created directory ${tmpDir}`);
 }
 
 process.on('unhandledRejection', (reason) => {
-  console.error('\x1b[31m%s\x1b[0m', `Unhandled promise rejection: ${reason}`);
-  console.error('\x1b[31m%s\x1b[0m', 'Unhandled promise rejection. Script will restart...');
+  error(`Unhandled promise rejection: ${reason}`);
+  warn('Unhandled promise rejection. Restarting script...');
   start('main.js');
 });
 
 process.on('exit', (code) => {
-  console.error(`Exited with code: ${code}`);
-  console.error('Script will restart...');
+  error(`Exited with code: ${code}. Restarting script...`);
   start('main.js');
 });
