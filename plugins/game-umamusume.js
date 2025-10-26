@@ -60,28 +60,31 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     let user = global.db.data.users[m.sender];
     
-    const horseList = horseNames.map(name => › ${name}).join('\n');
-    const usage = 🎌 *Selamat Datang di Arena Balap Kuda!* 🎌\n\nTaruh taruhanmu pada kuda jagoanmu dan menangkan hadiahnya!\n\n*Cara bermain:*\n${usedPrefix + command} <nama_kuda>|<jumlah_taruhan>\n\n*Contoh:*\n${usedPrefix + command} "Special Week"|5000\n\n*Catatan:*\n- Gunakan tanda kutip (") untuk nama kuda yang lebih dari satu kata.\n- Kamu bisa bertaruh pada 1 hingga 3 kuda, pisahkan dengan koma.\nContoh: \${usedPrefix + command} "Special Week", "Gold Ship"|10000\\n\n*Daftar Kuda Pacu:*\n${horseList};
+    const horseList = horseNames.map((name, index) => ${index + 1}. ${name}).join('\n');
+    const usage = 🎌 *Selamat Datang di Arena Balap Kuda!* 🎌\n\nTaruh taruhanmu pada kuda jagoanmu dan menangkan hadiahnya!\n\n*Cara bermain:*\n${usedPrefix + command} <jumlah_taruhan> <nomor_kuda>\n\n*Contoh:*\n${usedPrefix + command} 5000 1\n\n*Catatan:*\n- Kamu bisa bertaruh pada 1 hingga 3 kuda, pisahkan dengan spasi.\nContoh: ${usedPrefix + command} 10000 1 3 5\n\n*Daftar Kuda Pacu:*\n${horseList};
 
     if (!text) return conn.reply(m.chat, usage, fkontak);
 
-    const parts = text.split('|');
-    if (parts.length < 2) return conn.reply(m.chat, Format salah, Sensei!\n\n${usage}, fkontak);
-
-    const betAmount = parseInt(parts[parts.length - 1]);
-    if (isNaN(betAmount) || betAmount <= 0) return conn.reply(m.chat, 'Jumlah taruhan harus angka dan lebih dari 0!', fkontak);
+    const args = text.trim().split(/\s+/);
+    const betAmount = parseInt(args[0]);
+    if (isNaN(betAmount) || betAmount <= 0) return conn.reply(m.chat, Jumlah taruhan harus angka dan lebih dari 0!\n\n${usage}, fkontak);
     if (user.money < betAmount) return conn.reply(m.chat, Uangmu tidak cukup untuk taruhan sebesar ${betAmount.toLocaleString()}!, fkontak);
 
-    const betHorseInput = parts.slice(0, parts.length - 1).join('|');
-    const betHorses = betHorseInput.match(/"[^"]+"|\w+/g)?.map(h => h.replace(/"/g, '')) || [];
+    const horseNumbers = args.slice(1).map(n => parseInt(n));
 
-    if (betHorses.length === 0) return conn.reply(m.chat, 'Kamu harus memilih setidaknya satu kuda!', fkontak);
-    if (betHorses.length > 3) return conn.reply(m.chat, 'Maksimal hanya bisa bertaruh pada 3 kuda!', fkontak);
+    if (horseNumbers.length === 0) return conn.reply(m.chat, Kamu harus memilih setidaknya satu kuda!\n\n${usage}, fkontak);
+    if (horseNumbers.length > 3) return conn.reply(m.chat, 'Maksimal hanya bisa bertaruh pada 3 kuda!', fkontak);
 
-    const invalidHorses = betHorses.filter(h => !horseNames.includes(h));
-    if (invalidHorses.length > 0) {
-        return conn.reply(m.chat, Kuda bernama *"${invalidHorses.join(', ')}"* tidak ada dalam daftar pacuan.\n\n${usage}, fkontak);
+    const betHorses = [];
+    const invalidNumbers = [];
+    for (const num of horseNumbers) {
+        if (isNaN(num) || num < 1 || num > horseNames.length) {
+            invalidNumbers.push(num);
+        } else {
+            betHorses.push(horseNames[num - 1]);
+        }
     }
+    if (invalidNumbers.length > 0) return conn.reply(m.chat, Nomor kuda *"${invalidNumbers.join(', ')}"* tidak valid.\n\n${usage}, fkontak);
 
     user.money -= betAmount;
 
@@ -123,7 +126,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['umamusume <"nama_kuda">|<taruhan>'];
+handler.help = ['umamusume <taruhan> <nomor_kuda>'];
 handler.tags = ['game'];
 handler.command = /^(umamusume|race|balapkuda)$/i;
 handler.group = true;
