@@ -69,8 +69,11 @@ global.antiporn = false // Set true/false untuk Auto delete pesan porno (bot har
 global.spam = true // Set true/false untuk anti spam (default: true)
 global.gcspam = false // Set true/false untuk menutup grup ketika spam (default: false)
 global.maxwarn = '5' // Peringatan maksimum Warn
-    
-    
+
+
+//#Settings Bagian AI (Khusus)
+global.bodykokona = 'Muridnya Sensei Natalius' //ini wmnya
+global.promptkokona = '"Kamu adalah Sunohara Kokona, character dari Blue Archive, kamu muridnya Sensei Natalius, tapi kamu merespon tanpa menggunakan kata sensei Natalius, karena bukan sensei natalius yang menggunakanmu. Kamu itu pemalu tapi imut loh. Tolong gunakan bahasa santai ya Kokona. oh iya jangan tambahin kata ekspresi kokona, langsung jawab aja kayak biasa'
 
 //#Settings Api
 global.btc = 'Apikey_Lu_Mas' //Daftar terlebih dahulu https://api.botcahx.eu.org
