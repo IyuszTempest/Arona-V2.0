@@ -10,7 +10,7 @@ global.gamefav = 'Genshin Impact, Free Fire, PUBG Mobile'
 global.animefav = 'Dr Stone, Tenten Kakumei'
 global.waifuowner = 'Elaina'
 global.hobiowner = 'Nonton anime dan Ngoding Tipis tipis'
-global.namebot = 'Arona AI Multidevice' //nama bot lu
+global.namebot = 'Bot Euphy' //nama bot lu
 global.namecreator = 'IyuszTempest' //kalau ga ada jangan diubah ntar error
 global.namesponsor = 'Alfat.syah' //kalau ga ada jangan diubah ntar error
 global.numberowner = '6282255810534' //nomor owner utama, wajib
@@ -18,47 +18,48 @@ global.numberowner2 = '6285245307548' //kalau ga ada masukan owner utama aja
 global.numbercreator = '6285750351830' //kalau ga ada jangan diubah takut error
 global.numbersponsor = '6285872169153' //kalau ga ada jangan diubah takut error
 global.storelink = 'https://wa.me/6285245307548' //masukin kayak gitu biar kalau ada orang yang tertarik ama sewa bot lu
-global.mail = 'aronamail@desu' //bebas mau kek mana, jangan dikosongin
+global.mail = 'euphymail@desu' //bebas mau kek mana, jangan dikosongin
 global.mailowmer = 'iyusztempest@gmail.com' //wajib masukin, ini juga termasuk akun mega lu
 global.mailcreator = 'thecreator@mail.co.id' //biarin aja jangan diubah
 global.mailsponsor = 'thesponsor@mail.com' //biarin aja jangan diubah
-global.wm = '© Arona Bot Multidevice' //wm bot
+global.wm = '© Euphy' //wm bot
 global.wm2 = 'By IyuszTempest'
 global.pwmega = 'passwordmegalu' //ini password akun mega lu, buat plugin up mega)
 
 
 //#Media Sosial Owner
 global.gc = 'https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c' //bebas mau ch atau gc
-global.instagramowner = 'https://www.instagram.com/iyusz_tech?igsh=MTF2YnJjNmJ3ZXZ5cA==' //wajib
+global.instagramowner = '-' //wajib
 global.websiteowner = 'https://iyusztempest.my.id' //kalau ga ada ya biarin aja biar ga error
 global.pinterestowner = 'https://pin.it/ZJ73l4SqA'
-global.facebookowner = 'https://www.facebook.com/Iyusz.nime?mibextid=ZbWKwL'
-global.youtubeowner = 'https://youtube.com/@iyz_ftagm?si=VRWuxEgvkK-24ks7'
+global.facebookowner = '-'
+global.youtubeowner = '-'
 global.githubowner = 'https://github.com/IyuszTempest'
 
 
 
 //#Settings Thumbnail Link yang ada di plugins
-global.thumbnailutama = 'https://files.catbox.moe/0x7lr2.jpg' //thumbnail reply di semua menu
+global.menuimg = 'https://h.uguu.se/zpGWmmde.jpg' //thumbnail reply di semua menu
+global.modeimg ='https://h.uguu.se/zpGWmmde.jpg'
 global.gambarsewa1 = 'https://files.catbox.moe/ml8yts.jpg' //dari plugins info-sewa
 global.gambarsewa2 = 'https://files.catbox.moe/t0a7im.jpg'
 global.gambarsewa3 = 'https://files.catbox.moe/ftgesl.jpg'
 global.gambarsewa4 = 'https://files.catbox.moe/yl9k3i.jpg'
-global.fallbackthumb = 'https://file.idnet.my.id/api/preview.php?file=kg62lb3n.jpg'
-global.bcgc = 'https://file.idnet.my.id/api/preview.php?file=kg62lb3n.jpg'
-global.mediabiodata = 'https://files.catbox.moe/4gptni.jpg'
+global.fallbackthumb = 'https://h.uguu.se/zpGWmmde.jpg'
+global.bcgc = 'https://h.uguu.se/zpGWmmde.jpg'
+global.mediabiodata = 'https://h.uguu.se/zpGWmmde.jpg'
 
 
 
 //#Settings Loading
-global.wait = '_*lagi di proses kak...*_'
-global.eror = '_*yah lagi error nih, coba lagi nanti ya kak*_'
+global.wait = '_*Sabar yah, lagi diproses...*_'
+global.eror = '_*yah lagi error nih, coba lagi nanti*_'
 
 
 
 //#Settings bagian perstikeran :v
 global.stiker_wait = '*⫹⫺ Stiker lagi dibuat nih...*'
-global.packname = 'Arona Bot Multidevice'
+global.packname = 'Euphylia Magenta V1'
 global.author = 'By IyzTempest'
 
 
