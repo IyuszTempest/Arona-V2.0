@@ -1,121 +1,91 @@
-/*
- * Plugins CJs
- * Spotify Play (siputzx Search + aio Downloader)
- */
+/* Plugin: Spotify Downloader (Spotdown Edition)
+   Source: spotdown.org
+   Feature: Search & Download with Full Metadata
+*/
 
 const axios = require('axios');
 
-// API Key untuk downloader, diambil dari environment atau fallback
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || '1dda0d29d3mshc5f2aacec619c44p16f219jsn99a62a516f98';
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    // 1. CEK INPUT
+    if (!text) throw `Mau cari lagu apa di Spotify?\nContoh: *${usedPrefix + command} Kawaikute Gomen*`
 
-// --- FUNGSI PENCARI LAGU (DIGANTI KEMBALI KE SIPUTZX SESUAI PERMINTAAN) ---
-async function searchSpotify(query) {
-    const apiUrl = `https://api.siputzx.my.id/api/s/spotify?query=${encodeURIComponent(query)}`;
-    const { data } = await axios.get(apiUrl);
-    
-    if (!data.status || !data.data || data.data.length === 0) {
-        throw new Error('Tidak ada hasil yang ditemukan dari API search (siputzx).');
-    }
-    
-    // Mengembalikan link Spotify dari hasil pertama
-    return data.data[0].track_url;
-}
-
-
-// --- FUNGSI DOWNLOADER (TETAP PAKAI AIO) ---
-async function aio(url) {
-    try {
-        if (!url || !url.startsWith('http')) {
-            throw new Error('URL tidak valid, harus dimulai dengan http(s)://');
-        }
-
-        const { data } = await axios.post('https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink', {
-            url: url
-        }, {
-            headers: {
-                'accept-encoding': 'gzip',
-                'content-type': 'application/json; charset=utf-8',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36',
-                'x-rapidapi-host': 'auto-download-all-in-one.p.rapidapi.com',
-                'x-rapidapi-key': RAPIDAPI_KEY
-            }
-        });
-
-        if (data.status === 'fail' || !data.medias || data.medias.length === 0) {
-            throw new Error(data.msg || 'Gagal mengambil data dari API, mungkin link tidak didukung atau API key salah.');
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error in aio function:', error.message);
-        throw new Error(`Terjadi kesalahan saat mengakses API downloader: ${error.message}`);
-    }
-}
-
-// --- HANDLER UTAMA ---
-let handler = async (m, { conn, args }) => {
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-            }
-        },
-        participant: "0@s.whatsapp.net"
-    };
+    // Fast React biar makin kece
+    await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } });
 
     try {
-        if (!args[0]) {
-            return conn.reply(m.chat, 'Mau cari lagu apa? Tinggal ketik artis dan judul lagunya!\nContoh: hanatan gradation', fkontak);
-        }
+        // 2. JALANKAN LOGIKA SPOTIFY (Gue rapihin dari script lu)
+        const result = await spotifyDl(text);
+        const { metadata, audio } = result;
 
-        const query = args.join(' ');
-        await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
-        
-        const spotifyUrl = await searchSpotify(query);
-        const downloadResult = await aio(spotifyUrl);
-        const audio = downloadResult.medias.find(media => media.type === 'audio');
-
-        if (!audio) {
-            return conn.reply(m.chat, 'Tidak ditemukan file audio dari link Spotify tersebut. Coba cari lagu lain.', fkontak);
-        }
-        
-
-        const audioBuffer = await axios.get(audio.url, {
-            responseType: 'arraybuffer'
-        }).then(res => res.data);
-       
+        // 3. KIRIM INFORMASI LAGU (Aesthetic Style)
         await conn.sendMessage(m.chat, {
-            audio: audioBuffer, 
-            mimetype: 'audio/mpeg',
-            fileName: `${downloadResult.title || 'audio'}.mp3`,
+            text: `🎵 *${metadata.title}* - ${metadata.artist}\n⌛ _Sedang mengirim audio..._`,
             contextInfo: {
                 externalAdReply: {
-                    title: downloadResult.title || 'Downloaded Audio',
-                    body: `Dari: ${downloadResult.source || 'Link'}`,
-                    thumbnailUrl: downloadResult.thumbnail || 'https://telegra.ph/file/9914d35122605f2479f60.jpg',
-                    sourceUrl: spotifyUrl,
+                    title: metadata.title,
+                    body: `Artist: ${metadata.artist}`,
+                    thumbnailUrl: metadata.cover,
+                    sourceUrl: metadata.url,
                     mediaType: 1,
                     renderLargerThumbnail: true
                 }
             }
-        }, { quoted: fkontak });
+        }, { quoted: m });
 
-    } catch (error) {
-        console.error("Error di plugin Spotify:", error);
-        await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
-        conn.reply(m.chat, `Gomenasai, terjadi kesalahan: ${error.message}. Coba lagi nanti.`, fkontak);
+        // 4. KIRIM AUDIO BUFFER
+        await conn.sendMessage(m.chat, { 
+            audio: Buffer.from(audio), 
+            mimetype: 'audio/mpeg',
+            fileName: `${metadata.title}.mp3`
+        }, { quoted: m });
+
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    } catch (e) {
+        console.error(e);
+        m.reply(`Gomen Yus, ada masalah: ${e.message}`);
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
     }
 }
 
-handler.help = ["spotify <judul lagu>"];
-handler.command = ["spotify", "splay"];
-handler.tags = ['downloader'];
-handler.limit = true;
+/** * LOGIKA DOWNLOADER LU (Gue jadiin fungsi internal biar rapi)
+ */
+async function spotifyDl(input) {
+    const commonHeaders = {
+        'origin': 'https://spotdown.org',
+        'referer': 'https://spotdown.org/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    };
+
+    // Step 1: Search / Get Details
+    const { data: searchResult } = await axios.get(`https://spotdown.org/api/song-details?url=${encodeURIComponent(input)}`, {
+        headers: commonHeaders
+    });
+
+    const song = searchResult.songs?.[0];
+    if (!song) throw new Error('Lagu tidak ditemukan. Coba judul lain ya.');
+
+    // Step 2: Download Audio as Buffer
+    const { data: audioData } = await axios.post('https://spotdown.org/api/download', { url: song.url }, {
+        headers: commonHeaders,
+        responseType: 'arraybuffer'
+    });
+
+    return {
+        metadata: {
+            title: song.title,
+            artist: song.artist,
+            duration: song.duration,
+            cover: song.thumbnail,
+            url: song.url
+        },
+        audio: audioData
+    };
+}
+
+handler.help = ['spotify', 'spotdl']
+handler.tags = ['downloader']
+handler.command = /^(spotify|spotifydl|spotdl)$/i
+handler.limit = true
 
 module.exports = handler;
