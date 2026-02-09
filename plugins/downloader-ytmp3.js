@@ -1,82 +1,46 @@
-/*
- * Plugins CJS
- * YouTube MP3 Downloader (Khusus Link - Privatezia API)
- */
-
 const axios = require('axios');
 
-async function downloadYtMp3FromLink(youtubeUrl) {
-    const apiUrl = `https://api.privatezia.biz.id/api/downloader/ytmp3?url=${encodeURIComponent(youtubeUrl)}`;
-    try {
-        const { data } = await axios.get(apiUrl);
-        if (!data.status || !data.result || !data.result.downloadUrl) {
-            throw new Error(data.message || 'API tidak mengembalikan link download MP3 yang valid.');
-        }
-        return data.result;
-    } catch (error) {
-        console.error("Error calling API:", error);
-        throw new Error(`Gagal menghubungi API: ${error.message}`);
-    }
-}
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    if (!text) throw `*– Contoh:* ${usedPrefix + command} https://www.youtube.com/watch?v=K4xLi8IF1FM`
+    
+    // Validasi link YouTube sederhana
+    if (!text.includes('youtu')) throw 'Itu bukan link YouTube yang valid!'
 
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-            }
-        },
-        participant: "0@s.whatsapp.net"
-    };
-
-    const youtubeLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|)([\w-]{11})(?:\S+)?/;
-    if (!args[0] || !youtubeLinkRegex.test(args[0])) {
-        return conn.reply(m.chat, `Masukkan link YouTube yang valid\n\n*Contoh:*\n${usedPrefix + command} https://www.youtube.com/watch?v=xxxxxxxxxxx`, fkontak);
-    }
-    const youtubeUrl = args[0];
-
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
-    await conn.reply(m.chat, '_Wait..._', fkontak);
+    await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } });
 
     try {
-        const downloadResult = await downloadYtMp3FromLink(youtubeUrl);
+        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=720&url=${encodeURIComponent(text)}`;
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0NSwidXNlcm5hbWUiOiJJeXVzelRlbXBlc3QiLCJyb2xlIjoidXNlciIsInN1YnNjcmlwdGlvbl90aWVyIjoiZnJlZSIsImlzcyI6ImdpbWl0YS1hcGkiLCJleHAiOjE3NzA1OTU5NTgsImlhdCI6MTc3MDU5NTA1OH0.gdjq1WwN0HoT5z2B69l-bm7STLv-TE0MDv7vJC6r7Co';
 
-        const finalTitle = downloadResult.title || 'Judul Tidak Diketahui';
-        const finalThumbnail = downloadResult.thumbnail || 'https://telegra.ph/file/a6a4fa97a0c0044b89a7b.jpg';
-        const audioUrl = downloadResult.downloadUrl;
+        const res = await axios.get(apiUrl, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.data.success) throw new Error('API sedang bermasalah.');
+
+        const { download_url, title, thumbnail } = res.data.data;
 
         await conn.sendMessage(m.chat, {
-            audio: { url: audioUrl },
-            mimetype: 'audio/mpeg',
-            fileName: `${finalTitle}.mp3`,
+            audio: { url: download_url },
+            mimetype: 'audio/mp4',
+            fileName: `${title}.mp3`,
             contextInfo: {
                 externalAdReply: {
-                    title: finalTitle,
-                    body: global.wm || 'YT MP3 Link',
-                    thumbnailUrl: finalThumbnail,
-                    sourceUrl: youtubeUrl, 
+                    title: title,
+                    body: `YTMP3 Downloader - Manual Link`,
+                    thumbnailUrl: thumbnail,
                     mediaType: 1,
                     renderLargerThumbnail: true
                 }
             }
-        }, { quoted: fkontak });
+        }, { quoted: m });
 
-    } catch (err) {
-        console.error('❌ Error saat proses YouTube MP3 (Link):', err);
-        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, `Aduh, ada error nih: ${err.message}. Pastikan link-nya bener ya.`, fkontak);
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+    } catch (e) {
+        m.reply(`*Gagal ambil Audio!* ❌\n\nLog: ${e.message}`);
     }
 }
 
-handler.command = /^ytmp3$/i;
-handler.tags = ['downloader'];
-handler.help = ['ytmp3'];
-handler.limit = true;
-
-module.exports = handler;
+handler.help = ['ytmp3']
+handler.tags = ['downloader']
+handler.command = /^(ytmp3)$/i
