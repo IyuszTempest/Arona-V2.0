@@ -9,7 +9,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } });
 
     try {
-        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=720&url=${encodeURIComponent(text)}`;
+        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=360&url=${encodeURIComponent(text)}`;
         const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0NSwidXNlcm5hbWUiOiJJeXVzelRlbXBlc3QiLCJyb2xlIjoidXNlciIsInN1YnNjcmlwdGlvbl90aWVyIjoiZnJlZSIsImlzcyI6ImdpbWl0YS1hcGkiLCJleHAiOjE3NzA1OTU5NTgsImlhdCI6MTc3MDU5NTA1OH0.gdjq1WwN0HoT5z2B69l-bm7STLv-TE0MDv7vJC6r7Co';
 
         const res = await axios.get(apiUrl, {
