@@ -1,73 +1,56 @@
-/*
- * Plugins CJS
- * Play YouTube MP4 (Privatezia API Version)
- */
+/* Plugin: Video Downloader (Gimita API Edition)
+   Source: api.gimita.id
+   Feature: Search -> Get MP4 -> Send as Video
+*/
 
 const axios = require('axios');
+const ytSearch = require('yt-search');
 
-async function downloadYtMp4(queryOrUrl) {
-    const apiUrl = `https://api.privatezia.biz.id/api/downloader/ytplaymp4?query=${encodeURIComponent(queryOrUrl)}`;
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    // 1. CEK INPUT
+    if (!text) throw `*– Contoh:* ${usedPrefix + command} Kawaikute Gomen`
+    
+    // Fast React biar user tahu bot ngerespon
+    await conn.sendMessage(m.chat, { react: { text: '🎬', key: m.key } });
+
     try {
-        const { data } = await axios.get(apiUrl);
-        if (!data.status || !data.result || !data.result.downloadUrl) {
-            throw new Error(data.message || 'API tidak mengembalikan link download video yang valid.');
-        }
-        return data.result;
-    } catch (error) {
-        console.error("Error calling API:", error);
-        throw new Error(`Gagal menghubungi: ${error.message}`);
-    }
-}
-
-let handler = async (m, { conn, text, command, usedPrefix }) => {
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+        // 2. SEARCH VIDEO
+        const search = await ytSearch(text);
+        const video = search.videos[0];
+        if (!video) return m.reply('Gomen, videonya nggak ketemu.');
+        
+        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=360&url=${encodeURIComponent(video.url)}`;
+        
+        // 3. HIT API GIMITA (Pake Bearer Token Kamu)
+        const res = await axios.get(apiUrl, {
+            headers: {
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0NSwidXNlcm5hbWUiOiJJeXVzelRlbXBlc3QiLCJyb2xlIjoidXNlciIsInN1YnNjcmlwdGlvbl90aWVyIjoiZnJlZSIsImlzcyI6ImdpbWl0YS1hcGkiLCJleHAiOjE3NzA1OTU5NTgsImlhdCI6MTc3MDU5NTA1OH0.gdjq1WwN0HoT5z2B69l-bm7STLv-TE0MDv7vJC6r7Co'
             }
-        },
-        participant: "0@s.whatsapp.net"
-    };
+        });
 
-    if (!text) {
-        return conn.reply(m.chat, `Mau nyari video apa nih? Contoh:\n*${usedPrefix + command} hanatan gradation*`, fkontak);
-    }
+        if (!res.data.success) throw new Error('API-nya lagi mogok kerja, coba lagi nanti.');
 
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
-    await conn.reply(m.chat, '_Wait..._', fkontak);
+        const dlUrl = res.data.data.download_url;
 
-    try {
-        const downloadResult = await downloadYtMp4(text);
-
-        const finalTitle = downloadResult.title || 'Judul Tidak Diketahui';
-        const finalThumbnail = downloadResult.thumbnail || 'https://telegra.ph/file/a6a4fa97a0c0044b89a7b.jpg';
-        const videoDownloadUrl = downloadResult.downloadUrl;
-        const videoUrl = downloadResult.videoUrl;
-
+        // 4. KIRIM SEBAGAI VIDEO
         await conn.sendMessage(m.chat, {
-            video: { url: videoDownloadUrl },
-            mimetype: 'video/mp4',
-            fileName: `${finalTitle}.mp4`,
-            caption: `🎥 *Video Ditemukan!* 🎉\n\n📌 *Judul:* ${finalTitle}\n✨ *Kualitas:* ${downloadResult.quality || 'N/A'}\n🔗 *Link Asli:* ${videoUrl}`,
-        }, { quoted: fkontak });
+            video: { url: dlUrl },
+            caption: `*––––––『 ⛩️ 𝚅𝙸𝙳𝙴𝙾 𝙳𝙾𝙽𝙴 ⛩️ 』––––––*\n\n💠 *𝚃𝚒𝚝𝚕𝚎:* ${video.title}\n🕒 *𝙳𝚞𝚛𝚊𝚝𝚒𝚘𝚗:* ${video.timestamp}\n📊 *𝚀𝚞𝚊𝚕𝚒𝚝𝚢:* 360p\n\nSelamat menonton! 🌸`.trim(),
+            fileName: `${video.title}.mp4`,
+            mimetype: 'video/mp4'
+        }, { quoted: m });
 
-    } catch (err) {
-        console.error('❌ Error saat proses YouTube Video:', err);
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    } catch (e) {
+        console.error(e);
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, `Aduh, ada error nih: ${err.message}. Coba lagi ya.`, fkontak);
+        m.reply(`*Gagal Download Video!* 🛠️\n\nLog: ${e.message}`);
     }
 }
 
-handler.command = /^playvid$/i;
-handler.tags = ['downloader'];
-handler.help = ['playvid'];
-handler.limit = true;
+handler.help = ['playvid']
+handler.tags = ['downloader']
+handler.command = /^(playvid)$/i
 
 module.exports = handler;
-                               
