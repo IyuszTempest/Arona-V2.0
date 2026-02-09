@@ -1,13 +1,11 @@
 /* All-in-One Menu Euphylia Magenta
    Library: @adiwajshing/baileys
-   Style: Clean Japanese & Spaced Category
+   Style: Clean Japanese & Spaced Category (Most Stable)
 */
 
-const { BufferJSON, WA_DEFAULT_EPHEMERAL } = require('@adiwajshing/baileys')
 process.env.TZ = 'Asia/Jakarta'
 let fs = require('fs')
 let path = require('path')
-let levelling = require('../lib/levelling')
 
 const allTags = {
     'ai': '🤖 ‹ 𝙰𝙸 𝙸𝙽𝚃𝙴𝙻𝙻𝙸𝙶𝙴𝙽𝙲𝙴 ›',
@@ -29,12 +27,14 @@ const allTags = {
 
 let handler = async (m, { conn, usedPrefix: _p, args = [] }) => {
     try {
+        await conn.sendMessage(m.chat, { react: { text: "🏮", key: m.key } });
+
         let user = global.db.data.users[m.sender]
         if (!user) return m.reply('Sistem sedang memuat data, coba lagi...')
         
         let { level = 0, husbu = '', waifu = '' } = user
         let name = `@${m.sender.split`@`[0]}`
-        let imageMenu = global.menuimg,
+        const imageMenu = global.menuimg; // Fixed typo koma
 
         let gelar = (global.owner.includes(m.sender.replace('@s.whatsapp.net', ''))) ? 'Raja Iblis 👺' : (level >= 100) ? 'Grand Duke 🏰' : (level >= 50) ? 'Kesatria ⚔️' : 'Rakyat Jelata';
         let wibustatus = (husbu && husbu !== 'Belum Di Set') || (waifu && waifu !== 'Belum Di Set') ? 'Wibu Sejati 🎌' : 'Normal 👤';
@@ -50,30 +50,30 @@ let handler = async (m, { conn, usedPrefix: _p, args = [] }) => {
         
         let help = Object.values(global.plugins).filter(plugin => !plugin.disabled).map(plugin => ({
             help: Array.isArray(plugin.help) ? plugin.help : [plugin.help],
-            tags: Array.isArray(plugin.tags) ? plugin.tags : [plugin.tags],
-            prefix: 'customPrefix' in plugin
+            tags: Array.isArray(plugin.tags) ? plugin.tags : [plugin.tags]
         }))
 
-        // --- Logika Pengelompokan Kategori dengan Jarak ---
+        // --- Logika Pengelompokan Kategori ---
         for (let tag in allTags) {
             let categoryCommands = help.filter(m => m.tags.includes(tag)).map(m => {
                 return m.help.map(cmd => `  ◦ ⁠✿ ${_p + cmd}`).join('\n')
             }).join('\n')
             
             if (categoryCommands) {
-                menuList += `${allTags[tag]}\n${categoryCommands}\n\n` // Ditambah \n ganda buat jarak
+                menuList += `${allTags[tag]}\n${categoryCommands}\n\n`
             }
         }
         
         menuList += `_Total Fitur: ${help.length}_\n${global.wm}`
 
+        // Mengirim pesan gambar yang stabil
         return await conn.sendMessage(m.chat, {
             image: { url: imageMenu },
             caption: menuList,
             contextInfo: { 
                 mentionedJid: [m.sender],
                 externalAdReply: {
-                    title: `𝙴𝚞𝚙𝚑𝚢𝚕𝚒𝚊 𝙼𝚊𝚐𝚎𝚗𝚝𝚊 𝙼𝚞𝚕𝚝𝚒𝚍𝚎𝚟𝚒𝚌𝚎`,
+                    title: `𝙴𝚞p𝚑𝚢𝚕𝚒𝚊 𝙼𝚊𝚐𝚎𝚗𝚝𝚊 𝙼𝚞𝚕𝚝𝚒𝚍𝚎𝚟𝚒𝚌𝚎`,
                     body: `𝚂𝚢𝚜𝚝𝚎𝚖 𝙾𝚗𝚕𝚒𝚗𝚎 - 𝟸𝟶𝟸𝟼`,
                     mediaType: 1,
                     sourceUrl: global.gc,
@@ -85,7 +85,7 @@ let handler = async (m, { conn, usedPrefix: _p, args = [] }) => {
 
     } catch (e) {
         console.error(e)
-        m.reply('Waduh, sistem menunya nge-crash!')
+        m.reply('Waduh, sistem menunya nge-crash! Cek log terminal ya')
     }
 }
 
