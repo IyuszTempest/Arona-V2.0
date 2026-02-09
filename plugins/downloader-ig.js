@@ -1,82 +1,60 @@
-/* Plugins CJS
-Instagram downloader
-Sumber :https://whatsapp.com/channel/0029Vb6gPQsEawdrP0k43635
-Author : F6F411
+/* Plugin: Instagram Downloader (Multi-Media Edition)
+   Source: api.vreden.my.id
+   Feature: Auto Detect Single/Carousel (Image & Video)
 */
-const fetch = require('node-fetch')
 
-const snapins = async (urlIgPost) => {
-    const headers = {
-        "content-type": "application/x-www-form-urlencoded"
+const axios = require('axios');
+
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    if (!text) throw `*– Contoh:* ${usedPrefix + command} https://www.instagram.com/p/C6...`
+    
+    // Validasi link IG sederhana
+    if (!/instagram.com\/(p|reels|reel|tv)/.test(text)) {
+        throw 'Pastikan itu link Instagram (Post/Reels/TV) yang valid ya!'
     }
 
-    const response = await fetch("https://snapins.ai/action.php", {
-        headers,
-        body: "url=" + encodeURIComponent(urlIgPost),
-        method: "POST"
-    })
-
-    if (!response.ok) throw Error(`Gagal mendownload informasi. ${response.status} ${response.statusText}`)
-
-    const json = await response.json()
-
-    const name = json.data?.[0]?.author?.name || "(no name)"
-    const username = json.data?.[0]?.author?.username || "(no username)"
-
-    let images = []
-    let videos = []
-
-    json.data?.forEach(v => {
-        if (v.type === "image") {
-            images.push(v.imageUrl)
-        } else if (v.type === "video") {
-            videos.push(v.videoUrl)
-        }
-    })
-
-    return { name, username, images, videos }
-}
-
-let handler = async (m, { conn, args, command }) => {
-    if (!args[0]) {
-        return conn.reply(m.chat, `Mana URL Instagram nya, Sensei?\nContoh : .${command} https://www.instagram.com/p/xxxxx/`, m);
-    }
+    // Fast React
+    await conn.sendMessage(m.chat, { react: { text: '📸', key: m.key } });
 
     try {
-        // emoji proses random
-        const emojis = ['⏳', '🔄', '📡', '📥', '🔍', '🌀', '📲'];
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        await conn.reply(m.chat, `${randomEmoji} Sedang memproses, tunggu sebentar ya Sensei...`, m);
+        const apiUrl = `https://api.vreden.my.id/api/v1/download/instagram?url=${encodeURIComponent(text)}`;
+        const res = await axios.get(apiUrl);
 
-        let { images, videos } = await snapins(args[0]);
+        if (!res.data.status) throw new Error('API lagi nggak mood, coba lagi nanti ya.');
 
-        if (images.length === 0 && videos.length === 0) {
-            return conn.reply(m.chat, 'Maaf Sensei, Arona tidak menemukan gambar atau video dari link itu. Mungkin link-nya salah atau postingannya privat?', m);
-        }
+        const result = res.data.result;
+        const mediaData = result.data; // Ini array isinya foto/video
+        const caption = result.caption.text || '';
+        const profile = result.profile;
 
-        if (images.length > 0) {
-            await conn.reply(m.chat, `📷 Arona menemukan ${images.length} foto, akan segera dikirim...`, m);
-            for (const img of images) {
-                await conn.sendMessage(m.chat, { image: { url: img } }, { quoted: m });
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Jeda 1 detik
+        // Loop untuk kirim semua media (Carousel support)
+        for (let media of mediaData) {
+            if (media.type === 'video') {
+                await conn.sendMessage(m.chat, { 
+                    video: { url: media.url },
+                    caption: `🎬 *Video dari @${profile.username}*`
+                }, { quoted: m });
+            } else if (media.type === 'image') {
+                await conn.sendMessage(m.chat, { 
+                    image: { url: media.url },
+                    caption: `🖼️ *Image dari @${profile.username}*`
+                }, { quoted: m });
             }
+            // Kasih jeda dikit biar nggak spam/limit
+            await new Promise(resolve => setTimeout(resolve, 1500));
         }
 
-        if (videos.length > 0) {
-            await conn.reply(m.chat, `🎥 Arona menemukan ${videos.length} video, akan segera dikirim...`, m);
-            for (const vid of videos) {
-                await conn.sendMessage(m.chat, { video: { url: vid } }, { quoted: m });
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Jeda 1 detik
-            }
-        }
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
     } catch (e) {
         console.error(e);
-        await conn.reply(m.chat, `Waduh, sepertinya ada masalah, Sensei. Gagal mengambil data: ${e.message}`, m);
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+        m.reply(`*Gagal Download IG!* 🛠️\n\nError: ${e.message}`);
     }
 }
 
-handler.command = ['ig', 'igdl', 'instagram']
-handler.help = ['ig']
+handler.help = ['igdl']
 handler.tags = ['downloader']
+handler.command = /^(igdl|ig|instagram)$/i
 
-module.exports = handler
+module.exports = handler;
