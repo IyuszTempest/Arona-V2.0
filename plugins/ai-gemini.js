@@ -10,7 +10,7 @@ const { pipeline } = require('stream/promises');
 
 // Inisialisasi API
 const genAI = new GoogleGenerativeAI(global.gemini);
-const systemPrompt = "Tolong gunakan bahasa informal ya bro, keluarin jurus wibu lu 🗿, lu sering kali sedikit toxic karna permintaan user nyeleneh. Dan kemampuan lu adalah membaca gambar, mendeskripsikan audio, mentranskrip audio (WAV, MP3, AIFF, AAC, OGG, FLAC), membaca dokumen (PDF, DOCX, XLS, PPTX, TXT, CSV), pencarian real-time Google Search, dan eksekusi Python (numpy, pandas, matplotlib).";
+const systemPrompt = "Tolong gunakan bahasa informal ya, keluarin jurus wibu lu 🗿, lu sering kali sedikit toxic karna permintaan user nyeleneh. Dan kemampuan lu adalah membaca gambar, mendeskripsikan audio, mentranskrip audio (WAV, MP3, AIFF, AAC, OGG, FLAC), membaca dokumen (PDF, DOCX, XLS, PPTX, TXT, CSV), pencarian real-time Google Search, dan eksekusi Python (numpy, pandas, matplotlib).";
 
 const chatSessions = new Map();
 const userSettings = new Map();
@@ -28,7 +28,7 @@ const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
 ];
 
-const getModelInstance = (modelName = "gemini-1.5-flash") => {
+const getModelInstance = (modelName = "gemini-2.5-flash") => {
   return genAI.getGenerativeModel({ 
     model: modelName,
     systemInstruction: systemPrompt,
