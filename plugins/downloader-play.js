@@ -55,8 +55,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 }
 
-handler.help = ['yplay2']
+handler.help = ['play']
 handler.tags = ['downloader']
-handler.command = /^(yplay2|y2p2)$/i
+handler.command = /^(play)$/i
 
 module.exports = handler;
