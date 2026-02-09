@@ -17,7 +17,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     let who = m.isGroup ? (m.mentionedJid[0] ? m.mentionedJid[0] : (m.quoted ? m.quoted.sender : (text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : m.sender))) : m.sender;
 
-    if (!global.db.data.users[who]) return m.reply('Aduh Yus, user ini belum ada di database aku nih... 😥');
+    if (!global.db.data.users[who]) return m.reply('Aduh, user ini belum ada di database aku nih... 😥');
 
     let pp = 'https://telegra.ph/file/0c09038289a584348602b.jpg'
     try { pp = await conn.profilePictureUrl(who, 'image') } catch (e) { }
