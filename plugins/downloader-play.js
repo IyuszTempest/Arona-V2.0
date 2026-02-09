@@ -1,82 +1,62 @@
-/*
- * Plugins CJS 
- * Play YouTube MP3 (Privatezia API Version)
- */
+/* Plugin: Y2Play V2 (API Edition)
+   Source: api.gimita.id
+   Feature: Search -> Get MP4 -> Send as Audio
+*/
 
 const axios = require('axios');
 const ytSearch = require('yt-search');
 
-async function downloadYtMp3(queryOrUrl) {
-    const apiUrl = `https://api.privatezia.biz.id/api/downloader/ytplaymp3?query=${encodeURIComponent(queryOrUrl)}`;
-    try {
-        const { data } = await axios.get(apiUrl);
-        if (!data.status || !data.result || !data.result.downloadUrl) {
-            throw new Error(data.message || 'API tidak mengembalikan link download yang valid.');
-        }
-        return data.result; 
-    } catch (error) {
-        console.error("Error calling API:", error);
-        throw new Error(`Error Kak: ${error.message}`);
-    }
-}
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    if (!text) throw `*– Contoh:* ${usedPrefix + command} Kawaikute Gomen`
+    
+    await conn.sendMessage(m.chat, { react: { text: '🎐', key: m.key } });
 
-let handler = async (m, { conn, text, command, usedPrefix }) => {
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
+    try {
+        // 1. Search Video
+        const search = await ytSearch(text);
+        const video = search.videos[0];
+        if (!video) return m.reply('Lagu nggak ketemu.');
+        
+        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=720&url=${encodeURIComponent(video.url)}`;
+        
+        // 2. Hit API Gimita (Pake Token Kamu)
+        const res = await axios.get(apiUrl, {
+            headers: {
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0NSwidXNlcm5hbWUiOiJJeXVzelRlbXBlc3QiLCJyb2xlIjoidXNlciIsInN1YnNjcmlwdGlvbl90aWVyIjoiZnJlZSIsImlzcyI6ImdpbWl0YS1hcGkiLCJleHAiOjE3NzA1OTU5NTgsImlhdCI6MTc3MDU5NTA1OH0.gdjq1WwN0HoT5z2B69l-bm7STLv-TE0MDv7vJC6r7Co'
             }
-        },
-        participant: "0@s.whatsapp.net"
-    };
+        });
 
-    if (!text) {
-        return conn.reply(m.chat, `Mau nyari lagu apa nih? Contoh:\n*${usedPrefix + command} suki ga levechi*`, fkontak);
-    }
+        if (!res.data.success) throw new Error('API lagi mogok kerja nih.');
 
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
-    await conn.reply(m.chat, '_Wait..._', fkontak);
+        const dlUrl = res.data.data.download_url;
 
-    try {
-        const downloadResult = await downloadYtMp3(text); 
-
-        const finalTitle = downloadResult.title || 'Judul Tidak Diketahui';
-        const finalThumbnail = downloadResult.thumbnail || 'https://telegra.ph/file/a6a4fa97a0c0044b89a7b.jpg';
-        const audioUrl = downloadResult.downloadUrl;
-        const videoUrl = downloadResult.videoUrl;
-
+        // 3. Kirim sebagai Audio (Mimetype mp4 biar gampang diputer tapi dikirim sebagai audio)
         await conn.sendMessage(m.chat, {
-            audio: { url: audioUrl }, 
-            mimetype: 'audio/mpeg',
-            fileName: `${finalTitle}.mp3`,
+            audio: { url: dlUrl },
+            mimetype: 'audio/mp4', // Tetap bisa dibaca sebagai audio meski sumbernya mp4
+            fileName: `${video.title}.mp3`,
             contextInfo: {
                 externalAdReply: {
-                    title: finalTitle,
-                    body: global.wm || 'YT Play MP3',
-                    thumbnailUrl: finalThumbnail,
-                    sourceUrl: videoUrl, 
+                    title: video.title,
+                    body: `Euphylia Mangeta`,
+                    thumbnailUrl: video.thumbnail,
+                    sourceUrl: video.url,
                     mediaType: 1,
                     renderLargerThumbnail: true
                 }
             }
-        }, { quoted: fkontak });
+        }, { quoted: m });
 
-    } catch (err) {
-        console.error('❌ Error saat proses YouTube:', err);
-        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-        conn.reply(m.chat, `Aduh, ada error nih: ${err.message}. Coba lagi ya.`, fkontak);
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    } catch (e) {
+        console.error(e);
+        m.reply(`*Gagal Konversi!* ❌\n\nLog: ${e.message}`);
     }
 }
 
-handler.command = /^play$/i;
-handler.tags = ['downloader'];
-handler.help = ['play'];
-handler.limit = true;
+handler.help = ['yplay2']
+handler.tags = ['downloader']
+handler.command = /^(yplay2|y2p2)$/i
 
 module.exports = handler;
