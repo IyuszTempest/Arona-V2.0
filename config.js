@@ -22,7 +22,7 @@ global.mail = 'euphymail@desu' //bebas mau kek mana, jangan dikosongin
 global.mailowmer = 'iyusztempest@gmail.com' //wajib masukin, ini juga termasuk akun mega lu
 global.mailcreator = 'thecreator@mail.co.id' //biarin aja jangan diubah
 global.mailsponsor = 'thesponsor@mail.com' //biarin aja jangan diubah
-global.wm = '© Euphy' //wm bot
+global.wm = '© Euphylia Magenta' //wm bot
 global.wm2 = 'By IyuszTempest'
 global.pwmega = 'passwordmegalu' //ini password akun mega lu, buat plugin up mega)
 
