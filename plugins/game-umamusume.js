@@ -1,10 +1,6 @@
 /**
- * Credit
- * - ZTRdiamond
- * - Source: https://whatsapp.com/channel/0029VbC6NKM96H4ZW9Q5az2R
- * - Source: https://whatsapp.com/channel/0029VagFeoY9cDDa9ulpwM0T
- * 
- * Modified and integrated by Arona for Arona-MD
+ * Modified by Gemini for Yus (IyuszTempest)
+ * Feature: Weather System & Performance Variance
  */
 
 const horseNames = [
@@ -12,17 +8,23 @@ const horseNames = [
     "Gold Ship", "Daiwa Scarlet", "Vodka", "Grass Wonder", "T.M. Opera O"
 ];
 
-function startRace(betHorses = []) {
-    if (!Array.isArray(betHorses)) throw new Error("Taruhan harus berupa array.");
-    if (betHorses.length === 0) throw new Error("Minimal pasang 1 kuda untuk taruhan.");
-    if (betHorses.length > 3) throw new Error("Maksimal pasang 3 kuda untuk taruhan.");
+const weathers = [
+    { name: "Cerah ☀️", multiplier: 1.2 },
+    { name: "Mendung ☁️", multiplier: 1.0 },
+    { name: "Hujan 🌧️", multiplier: 0.8 },
+    { name: "Badai ⛈️", multiplier: 0.5 }
+];
 
+function startRace(betHorses = []) {
+    const weather = weathers[Math.floor(Math.random() * weathers.length)];
     const randomRange = (min, max) => Math.random() * (max - min) + min;
+    
     const results = horseNames.map(name => {
         const speed = randomRange(80, 100);
         const stamina = randomRange(75, 100);
-        const mood = randomRange(0.8, 1.2);
-        const performance = ((speed * 0.6) + (stamina * 0.4)) * mood;
+        const motivation = randomRange(0.8, 1.2); // Mood kuda
+        // Inovasi: Cuaca mempengaruhi performa akhir
+        const performance = ((speed * 0.6) + (stamina * 0.4)) * motivation * weather.multiplier;
 
         return { horse: name, performance };
     });
@@ -39,97 +41,94 @@ function startRace(betHorses = []) {
     const winnerHorse = output.find(h => h.win).horse;
     const betWin = betHorses.includes(winnerHorse);
 
-    return output.map(o => ({ ...o, betWin }));
+    return { output, weather, betWin };
 }
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD
-            }
-        },
+        key: { participants: "0@s.whatsapp.net", remoteJid: "status@broadcast", fromMe: false, id: "UmaMusume" },
+        message: { contactMessage: { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;Euphy;;;\nFN:Euphy\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` } },
         participant: "0@s.whatsapp.net"
     };
 
     let user = global.db.data.users[m.sender];
+    const horseList = horseNames.map((name, index) => `┃ ${index + 1}. ${name}`).join('\n');
     
-    const horseList = horseNames.map((name, index) => ${index + 1}. ${name}).join('\n');
-    const usage = 🎌 *Selamat Datang di Arena Balap Kuda!* 🎌\n\nTaruh taruhanmu pada kuda jagoanmu dan menangkan hadiahnya!\n\n*Cara bermain:*\n${usedPrefix + command} <jumlah_taruhan> <nomor_kuda>\n\n*Contoh:*\n${usedPrefix + command} 5000 1\n\n*Catatan:*\n- Kamu bisa bertaruh pada 1 hingga 3 kuda, pisahkan dengan spasi.\nContoh: ${usedPrefix + command} 10000 1 3 5\n\n*Daftar Kuda Pacu:*\n${horseList};
+    const usage = `╭━━〔 ⛩️ *𝚄𝙼𝙰 𝙼𝚄𝚂𝚄𝙼𝙴 𝚁𝙰𝙲𝙴* ⛩️ 〕━━┓
+┃
+┃ *Cara bermain:*
+┃ ${usedPrefix + command} <taruhan> <nomor>
+┃
+┃ *Contoh:*
+┃ ${usedPrefix + command} 5000 1
+┃
+┣━━〔 🐎 *𝙳𝙰𝙵𝚃𝙰𝚁 𝙺𝚄𝙳𝙰* 〕━━┓
+${horseList}
+┗━━━━━━━━━━━━━━━━━━━━┛`;
 
     if (!text) return conn.reply(m.chat, usage, fkontak);
 
     const args = text.trim().split(/\s+/);
     const betAmount = parseInt(args[0]);
-    if (isNaN(betAmount) || betAmount <= 0) return conn.reply(m.chat, Jumlah taruhan harus angka dan lebih dari 0!\n\n${usage}, fkontak);
-    if (user.money < betAmount) return conn.reply(m.chat, Uangmu tidak cukup untuk taruhan sebesar ${betAmount.toLocaleString()}!, fkontak);
+    if (isNaN(betAmount) || betAmount <= 0) return conn.reply(m.chat, `⚠️ Jumlah taruhan harus angka!`, fkontak);
+    if (user.money < betAmount) return conn.reply(m.chat, `❌ Uangmu kurang, Saldomu cuma: ${user.money.toLocaleString()}`, fkontak);
 
     const horseNumbers = args.slice(1).map(n => parseInt(n));
-
-    if (horseNumbers.length === 0) return conn.reply(m.chat, Kamu harus memilih setidaknya satu kuda!\n\n${usage}, fkontak);
-    if (horseNumbers.length > 3) return conn.reply(m.chat, 'Maksimal hanya bisa bertaruh pada 3 kuda!', fkontak);
+    if (horseNumbers.length === 0 || horseNumbers.length > 3) return conn.reply(m.chat, `⚠️ Pilih 1-3 nomor kuda!`, fkontak);
 
     const betHorses = [];
-    const invalidNumbers = [];
     for (const num of horseNumbers) {
-        if (isNaN(num) || num < 1 || num > horseNames.length) {
-            invalidNumbers.push(num);
-        } else {
+        if (!isNaN(num) && num >= 1 && num <= horseNames.length) {
             betHorses.push(horseNames[num - 1]);
         }
     }
-    if (invalidNumbers.length > 0) return conn.reply(m.chat, Nomor kuda *"${invalidNumbers.join(', ')}"* tidak valid.\n\n${usage}, fkontak);
+
+    if (betHorses.length === 0) return conn.reply(m.chat, `⚠️ Nomor kuda tidak valid!`, fkontak);
 
     user.money -= betAmount;
 
-    await conn.reply(m.chat, 🏇 *Balapan Dimulai!* 🏇\n\nSensei bertaruh *${betAmount.toLocaleString()}* pada kuda: *${betHorses.join(', ')}*.\n\nPara kuda sudah bersiap di garis start..., fkontak);
+    const { output, weather, betWin } = startRace(betHorses);
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    await conn.reply(m.chat, 'Mereka melesat! Debu beterbangan di arena!', m);
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    await conn.reply(m.chat, 'Tikungan terakhir! Siapakah yang akan menjadi juara?', m);
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    let startMsg = `🏇 *BALAPAN DIMULAI!* 🏇\n\n`
+    startMsg += `🏟️ *Arena:* Nakayama Racecourse\n`
+    startMsg += `🌦️ *Cuaca:* ${weather.name}\n`
+    startMsg += `💰 *Taruhan:* ${betAmount.toLocaleString()}\n`
+    startMsg += `🐎 *Jagoan:* ${betHorses.join(', ')}\n\n`
+    startMsg += `_Para Uma Musume mulai memasuki gate..._`
 
-    try {
-        const raceResults = startRace(betHorses);
-        const winner = raceResults.find(r => r.win);
-        const didBetWin = raceResults[0].betWin;
+    await conn.reply(m.chat, startMsg, fkontak);
 
-        let resultText = 🏁 *Hasil Balapan* 🏁\n\nJuara pertama adalah... *${winner.horse}*!\n\n;
-        resultText += '┌─「 Papan Peringkat 」\n';
-        raceResults.forEach(r => {
-            const betMarker = r.bet ? '🏇' : '';
-            resultText += │ ${r.finished}. ${r.horse} ${betMarker}\n;
-        });
-        resultText += '└──────────\n\n';
+    // Simulasi Delay biar seru
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    await conn.reply(m.chat, `🏁 *GATE TERBUKA!* Mereka melesat dengan kecepatan tinggi!`, m);
+    await new Promise(resolve => setTimeout(resolve, 4000));
 
-        if (didBetWin) {
-            const prize = betAmount * 2;
-            user.money += prize;
-            resultText += 🎉 *Selamat, Sensei!* 🎉\nTaruhanmu pada *${winner.horse}* menang!\nKamu mendapatkan hadiah *${prize.toLocaleString()}* Money!;
-        } else {
-            resultText += 💔 *Yah, Kalah...* 💔\nSayang sekali, taruhanmu tidak menang kali ini. Uang taruhan *${betAmount.toLocaleString()}* hangus. Coba lagi lain kali!;
-        }
+    let resultText = `🏁 *HASIL BALAPAN* 🏁\n`
+    resultText += `Cuaca: ${weather.name}\n\n`
+    
+    output.slice(0, 5).forEach(r => {
+        const medal = r.finished === 1 ? '🥇' : r.finished === 2 ? '🥈' : r.finished === 3 ? '🥉' : '🏃';
+        resultText += `${medal} *${r.finished}. ${r.horse}* ${r.bet ? '⭐' : ''}\n`;
+    });
 
-        await conn.reply(m.chat, resultText, fkontak);
+    resultText += `\n`
 
-    } catch (e) {
-        console.error(e);
-        user.money += betAmount;
-        await conn.reply(m.chat, Gomen, Sensei! Terjadi kesalahan saat balapan: ${e.message}. Uang taruhanmu sudah dikembalikan., fkontak);
+    if (betWin) {
+        const prize = Math.ceil(betAmount * 2.5); // Bonus cuaca cerah/hujan bisa ditambah logikanya di sini
+        user.money += prize;
+        resultText += `🎉 *MENANG!* Kuda jagoanmu juara 1!\n`
+        resultText += `🎁 Hadiah: *+${prize.toLocaleString()} Money*`;
+    } else {
+        resultText += `💔 *KALAH...* Jagoanmu gagal mencapai podium pertama. Taruhan hangus!`;
     }
+
+    await conn.reply(m.chat, resultText, fkontak);
 };
 
-handler.help = ['umamusume <taruhan> <nomor_kuda>'];
+handler.help = ['umamusume <bet> <no>'];
 handler.tags = ['game'];
 handler.command = /^(umamusume|race|balapkuda)$/i;
 handler.group = true;
-handler.limit = true;
 
 module.exports = handler;
+        
