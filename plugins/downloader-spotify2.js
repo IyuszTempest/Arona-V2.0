@@ -46,8 +46,8 @@ type
     throw `*Server down!*`
    }
 };
-handler.help = ['spotify3', 'splay3']
-handler.command = /^(spotify3|splay3)$/i
+handler.help = ['spotify2', 'splay2']
+handler.command = /^(spotify2|splay2)$/i
 handler.tags = ['downloader'];
 handler.limit = true;
 handler.group = false;
