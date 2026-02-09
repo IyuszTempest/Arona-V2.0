@@ -1,7 +1,7 @@
 //#Settings Info Owner dan Bot
-global.owner = ['6282255810534','6285245307548','12773870301387','181067281604634'] //masukin lid nya juga
+global.owner = ['6282255810534','12773870301387','181067281604634'] //masukin lid nya juga
 global.mods = ['6282255810534','12773870301387','181067281604634'] //lid nya jangan lupa
-global.prems = ['6282255810534','6285245307548','12773870301387','181067281604634'] //jangan lupa lid nya mas
+global.prems = ['6282255810534','12773870301387','181067281604634'] //jangan lupa lid nya mas
 global.nameowner = 'IyuszTempest' //owner utama
 global.umurowner = '18 Tahun'
 global.genderowner = 'Laki-laki'
@@ -39,26 +39,26 @@ global.githubowner = 'https://github.com/IyuszTempest'
 
 
 //#Settings Thumbnail Link yang ada di plugins
-global.menuimg = 'https://h.uguu.se/zpGWmmde.jpg' //thumbnail reply di semua menu
-global.modeimg ='https://h.uguu.se/zpGWmmde.jpg'
+global.menuimg = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXHFJP9VXUiUz_U1QVB_9ZLyYDGQ5flkJXBFTOoSaDOaIgkv5X3I8nyxo&s=10' //thumbnail reply di semua menu
+global.modeimg ='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXHFJP9VXUiUz_U1QVB_9ZLyYDGQ5flkJXBFTOoSaDOaIgkv5X3I8nyxo&s=10'
 global.gambarsewa1 = 'https://files.catbox.moe/ml8yts.jpg' //dari plugins info-sewa
 global.gambarsewa2 = 'https://files.catbox.moe/t0a7im.jpg'
 global.gambarsewa3 = 'https://files.catbox.moe/ftgesl.jpg'
 global.gambarsewa4 = 'https://files.catbox.moe/yl9k3i.jpg'
-global.fallbackthumb = 'https://h.uguu.se/zpGWmmde.jpg'
-global.bcgc = 'https://h.uguu.se/zpGWmmde.jpg'
-global.mediabiodata = 'https://h.uguu.se/zpGWmmde.jpg'
+global.fallbackthumb = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXHFJP9VXUiUz_U1QVB_9ZLyYDGQ5flkJXBFTOoSaDOaIgkv5X3I8nyxo&s=10'
+global.bcgc = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXHFJP9VXUiUz_U1QVB_9ZLyYDGQ5flkJXBFTOoSaDOaIgkv5X3I8nyxo&s=10'
+global.mediabiodata = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXHFJP9VXUiUz_U1QVB_9ZLyYDGQ5flkJXBFTOoSaDOaIgkv5X3I8nyxo&s=10'
 
 
 
 //#Settings Loading
-global.wait = '_*Sabar yah, lagi diproses...*_'
-global.eror = '_*yah lagi error nih, coba lagi nanti*_'
+global.wait = '_🌸 Sabar yah, lagi diproses..._'
+global.eror = '_🙄 Yah lagi error nih, coba lagi nanti_'
 
 
 
 //#Settings bagian perstikeran :v
-global.stiker_wait = '*⫹⫺ Stiker lagi dibuat nih...*'
+global.stiker_wait = '✨ Tunggu sebentar...'
 global.packname = 'Euphylia Magenta V1'
 global.author = 'By IyzTempest'
 
