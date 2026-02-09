@@ -16,7 +16,7 @@ let handler = async (m, { conn }) => {
     let _uptime = process.uptime() * 1000;
     let uptimex = clockString(_uptime);
     
-    let image = 'https://h.uguu.se/zpGWmmde.jpg'; 
+    const image = global.modeimg;
     
     let modeText = global.opts?.['self'] ? 'Self (Private)' : 'Public';
     let usersCount = Object.keys(global.db?.data?.users || {}).length;
@@ -34,8 +34,7 @@ let handler = async (m, { conn }) => {
 
     let caption = `*––––––『 ⛩️ 𝚂𝚈𝚂𝚃𝙴𝙼 𝚂𝚃𝙰𝚃𝚄𝚂 ⛩️ 』––––––*
 
-Hai! ✨
-Berikut adalah laporan kondisi sistem *Euphy* saat ini. Semuanya terpantau stabil!
+Hai! Berikut adalah laporan kondisi sistem *Euphy* saat ini. Semuanya terpantau stabil!
 
 ┏━━〔 🤖 *𝙸𝙽𝙵𝙾 𝙱𝙾𝚃* 〕━━┓
 ┃ 💠 *𝙼𝚘𝚍𝚎:* ${modeText}
@@ -94,4 +93,4 @@ function clockString(ms) {
     let m = Math.floor(ms / 60000) % 60;
     let s = Math.floor(ms / 1000) % 60;
     return `${h}j ${m}m ${s}d`;
-  }
+}
