@@ -1,60 +1,55 @@
-const axios = require('axios');
+/* Plugin: Preset AM (Alight Motion)
+   Source: iyusztempest.my.id
+   Feature: Fetch latest aesthetic presets
+*/
+
+const fetch = require('node-fetch');
 
 let handler = async (m, { conn, usedPrefix, command }) => {
-    const fkontak = {
-        key: {
-            participants: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            fromMe: false,
-            id: "Halo"
-        },
-        message: {
-            contactMessage: {
-                vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${global.nameowner};Bot;;;\nFN:${global.nameowner}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-            }
-        },
-        participant: "0@s.whatsapp.net"
-    };
+    // Fast React biar makin sat-set 🗿
+    await conn.sendMessage(m.chat, { react: { text: '🎬', key: m.key } });
 
     try {
-        await conn.reply(m.chat, global.wait || 'Sabar, lagi nyari preset...', fkontak);
+        const res = await fetch('https://iyusztempest.my.id/api/tools?feature=presetam');
+        const json = await res.json();
 
-        const { data } = await axios.get('https://iyusztempest.my.id/api/tools?feature=presetam');
-
-        if (data.status !== 'success' || !data.media?.text) {
-            throw new Error('Format API tidak valid atau tidak ada data preset.');
+        if (json.status !== 'success' || !json.data || !json.data.text) {
+            return m.reply('Gomen, database presetnya lagi kosong atau API lagi maintenance 😥');
         }
 
-        const message = data.message;
-        const author = data.author;
-        const presetText = data.media.text;
+        // --- PROSES PERCANTIK TEKS ---
+        let caption = `*–––––『 🎬 𝙿𝚁𝙴𝚂𝙴𝚃 𝙰𝙻𝙸𝙶𝙷𝚃 𝙼𝙾𝚃𝙸𝙾𝙽 』–––––*\n\n`
+        caption += `📝 *𝙼𝚎𝚜𝚜𝚊𝚐𝚎:* ${json.message || 'Preset kece buat lu!'}\n`
+        caption += `━━━━━━━━━━━━━━━━━━━━\n\n`
+        caption += `${json.data.text}\n\n`
+        caption += `*© Euphy by IyuszTempest ✨*`
 
-        const outputText = `✨ *PRESET ALIGHT MOTION* ✨\n\n${presetText}*`;
-
+        // Kirim dengan AdReply biar ada thumbnail-nya
         await conn.sendMessage(m.chat, {
-            text: outputText,
+            text: caption,
             contextInfo: {
                 externalAdReply: {
-                    title: "Preset Jedag Jedug (JJ) 🎶",
-                    body: "kumpulan Preset Alight Motion",
-                    thumbnailUrl: global.thumbnailutama,
-                    sourceUrl: global.instagramowner,
+                    title: 'PRESET AM AESTHETIC',
+                    body: 'Klik buat ambil preset terbaru!',
+                    thumbnailUrl: global.fallbackthumb, // Lu bisa ganti link gambar AM lu
+                    sourceUrl: 'https://iyusztempest.my.id',
                     mediaType: 1,
                     renderLargerThumbnail: true
                 }
             }
-        }, { quoted: fkontak });
+        }, { quoted: m });
 
-    } catch (error) {
-        console.error("Error fetching preset AM:", error);
-        await conn.reply(m.chat, 'Gagal mengambil preset, masbro. Coba lagi nanti ya.', fkontak);
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    } catch (e) {
+        console.error(e);
+        m.reply('Waduh, koneksi ke database lagi bermasalah! Coba cek panel Pterodactyl');
     }
-};
+}
 
-handler.help = ['presetam'];
-handler.tags = ['tools', 'premium'];
-handler.command = ['presetam'];
-handler.premium = true;
-handler.limit = false;
+handler.help = ['presetam']
+handler.tags = ['tools']
+handler.command = /^(presetam)$/i
+handler.limit = true
 
 module.exports = handler;
