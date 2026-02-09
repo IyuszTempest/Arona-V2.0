@@ -1,10 +1,10 @@
-/* 
+/*
 ini play beton
 Gw matiin dulu karena pake baileys ori
 * nanas
 */
 
-/**
+
 const {
   proto,
   generateWAMessageFromContent,
@@ -87,11 +87,10 @@ var handler = async (m, {
   }
 };
 
-handler.help = ["play"];
+handler.help = ["bplay"];
 handler.tags = ["downloader"];
-handler.command = /^(play)$/i;
+handler.command = /^(bplay)$/i;
 handler.limit = true;
 handler.register = true;
 
 module.exports = handler;
-**/
