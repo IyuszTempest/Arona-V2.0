@@ -17,7 +17,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         const video = search.videos[0];
         if (!video) return m.reply('Lagu nggak ketemu.');
         
-        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=720&url=${encodeURIComponent(video.url)}`;
+        const apiUrl = `https://api.gimita.id/api/downloader/ytmp4?resolution=360&url=${encodeURIComponent(video.url)}`;
         
         // 2. Hit API Gimita (Pake Token Kamu)
         const res = await axios.get(apiUrl, {
