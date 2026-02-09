@@ -50,12 +50,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     await conn.sendMessage(m.chat, {
       image: resultBuffer,
-      caption: `
-✨ Gambar kamu telah ditingkatkan hingga 2x resolusi.
-
-📈 Kualitas lebih tajam & detail lebih jelas.
-
-🔧 _Gunakan fitur ini kapan saja untuk memperjelas gambar blur._
+      caption: `🌸 D O N E
 `.trim()
     }, { quoted: m })
 
@@ -66,8 +61,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   }
 }
 
-handler.help = ['upscale']
+handler.help = ['hd']
 handler.tags = ['tools', 'image','ai']
-handler.command = /^upscale$/i
+handler.command = /^hd$/i
 
 module.exports = handler;
