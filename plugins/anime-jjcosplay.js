@@ -53,7 +53,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['jjcosplay'];
-handler.tags = ['anime', 'fun'];
+handler.tags = ['anime'];
 handler.command = /^(jjcosplay)$/i;
 handler.limit = true;
 
