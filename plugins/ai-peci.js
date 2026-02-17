@@ -76,7 +76,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 };
 
 handler.help = ['peci'];
-handler.tags = ['anime','premium','ai'];
+handler.tags = ['premium','ai'];
 handler.command = /^peci$/i;
 
 handler.premium = true;
