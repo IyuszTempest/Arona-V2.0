@@ -66,7 +66,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
 handler.help = ['scribd <url>'];
 handler.tags = ['downloader'];
-handler.command = /^(scribd|scribddl)$/i;
+handler.command = /^(scribd)$/i;
 handler.limit = true;
 
 module.exports = handler;
