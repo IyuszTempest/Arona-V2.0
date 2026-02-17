@@ -2006,9 +2006,9 @@ let handler = async (m, { conn, command }) => {
     
      conn.reply(m.chat,`${pickRandom(global.anu)}`);;
 }
-handler.help = ['hinaadmin']
-handler.tags = ['info', 'fun']
-handler.command = ['hinaadmin']
+handler.help = ['adminkontol']
+handler.tags = ['fun']
+handler.command = ['adminkontol']
 module.exports = handler
 
 function pickRandom(list) {
