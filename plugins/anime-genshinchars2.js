@@ -68,9 +68,10 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['genshinchars2 <karakter>'];
-handler.tags = ['anime', 'info'];
-handler.command = /^(genshinchars2)$/i;
+handler.help = ['genshinchars <karakter>'];
+handler.tags = ['anime'];
+handler.command = /^(genshinchars)$/i;
 handler.limit = true;
+handler.premium = true;
 
 module.exports = handler;
