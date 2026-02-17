@@ -22,7 +22,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     
     try {
         if (!global.lolkey) {
-            return conn.reply(m.chat, 'Maaf, API key Lolhuman belum diisi di config.js. Silakan isi dulu ya, masbro!', fkontak);
+            return conn.reply(m.chat, 'Maaf, API key Lolhuman belum diisi di config.js. Silakan isi dulu ya!', fkontak);
         }
         
         await conn.reply(m.chat, global.wait, fkontak);
@@ -48,9 +48,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['wallpaperanime'];
-handler.tags = ['image', 'anime'];
-handler.command = /^(wallnime|wallpaperanime)$/i;
+handler.help = ['wallanime'];
+handler.tags = ['anime'];
+handler.command = /^(wallnime)$/i;
 handler.limit = true;
 
 module.exports = handler;
