@@ -85,7 +85,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 }
 
 handler.help = ['bilibili <url>'];
-handler.command = ['bilibili', 'bilibilidl'];
+handler.command = ['bilibili'];
 handler.tags = ['downloader'];
 handler.limit = true;
 handler.premium = false;
