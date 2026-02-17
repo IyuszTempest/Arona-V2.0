@@ -106,8 +106,8 @@ let handler = async (m, { conn, command, args }) => {
     }
 };
 
-handler.help = ['creart', 'img2img'];
+handler.help = ['creart'];
 handler.tags = ['ai'];
-handler.command = ['creart', 'img2img'];
+handler.command = ['creart'];
 
 module.exports = handler;
