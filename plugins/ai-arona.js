@@ -341,7 +341,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
 handler.help = ["arona"].map(a => a + " *<text>*");
 handler.help.push("resetarona");
-handler.tags = ['main','ai'];
+handler.tags = ['ai'];
 handler.command = /^(arona|resetarona)$/i;
 handler.limit = true;
 handler.register = true;
