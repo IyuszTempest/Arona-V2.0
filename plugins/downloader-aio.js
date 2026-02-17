@@ -21,11 +21,11 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         throw eror
     }
 };
-handler.help = handler.command = ['aio2'];
+handler.help = handler.command = ['aio'];
 handler.tags = ['downloader'];
 handler.limit = true;
 handler.group = false;
-handler.premium = false;
+handler.premium = true;
 handler.owner = false;
 handler.admin = false;
 handler.botAdmin = false;
