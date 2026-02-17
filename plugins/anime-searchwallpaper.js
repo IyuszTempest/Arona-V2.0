@@ -21,7 +21,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     };
     
     if (!args[0]) {
-        return conn.reply(m.chat, `Mau cari wallpaper apa, masbro?\n\n*Contoh:* *${usedPrefix + command}* loli kawaii`, fkontak);
+        return conn.reply(m.chat, `Mau cari wallpaper apa?\n\n*Contoh:* *${usedPrefix + command}* loli kawaii`, fkontak);
     }
 
     try {
@@ -59,9 +59,9 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['wallpapersearch <query>'];
-handler.tags = ['image', 'anime'];
-handler.command = /^(wallpapersearch|wpsearch)$/i;
+handler.help = ['wpsearch <query>'];
+handler.tags = ['anime'];
+handler.command = /^(wpsearch)$/i;
 handler.limit = true;
 
 module.exports = handler;
