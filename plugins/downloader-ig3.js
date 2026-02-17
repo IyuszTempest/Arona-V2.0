@@ -22,9 +22,9 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
    }
 }
 
-handler.help = ['instagram4'].map(v => v + ' <url>')
+handler.help = ['ig3'].map(v => v + ' <url>')
 handler.tags = ['downloader']
-handler.command = /^(ig4|instagram4)$/i
+handler.command = /^(ig3)$/i
 handler.limit = true
 
 module.exports = handler
