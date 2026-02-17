@@ -27,7 +27,7 @@ let handler = async (m, { text, conn }) => {
       externalAdReply: {
         title: "EUPHY SYSTEM: AFK ACTIVATED",
         body: `${senderName} sedang istirahat`,
-        thumbnailUrl: "https://imgur.com/q8fkSFG", // Ganti link foto Elaina favoritmu
+        thumbnailUrl: global.menuimg, // Ganti link foto Elaina favoritmu
         sourceUrl: "afk.com",
         mediaType: 1,
         renderLargerThumbnail: true
