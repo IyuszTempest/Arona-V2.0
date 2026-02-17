@@ -1,89 +1,75 @@
-let handler = m => m;
+/**
+ * @ 💤 AFK Detector - Handler
+ **/
 
-handler.before = async m => { 
-  let user = global.db.data.users[m.sender];
+let handler = m => m
 
-  // --- TAMBAH FILTER DI SINI ---
-  // Pastikan ini adalah pesan teks, gambar, video, atau audio yang punya body/caption
-  if (!m.text && !m.message && !m.msg) return true; // ABAIKAN JIKA BUKAN PESAN DENGAN KONTEN
-  // Tambahan: Lo bisa juga cek m.mtype
-  // if (m.mtype === 'reactionMessage' || m.mtype === 'protocolMessage' || m.mtype === 'senderKeyDistributionMessage') return true;
-  // --- AKHIR FILTER ---
+handler.before = async (m, { conn }) => {
+  let user = global.db.data.users[m.sender]
 
-  const fkontak = {
-      key: {
-          participants: "0@s.whatsapp.net",
-          remoteJid: "status@broadcast",
-          fromMe: false,
-          id: "Halo"
-      },
-      message: {
-          contactMessage: {
-              vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-          }
-      },
-      participant: "0@s.whatsapp.net"
-  };
+  // Filter biar nggak error pas dapet pesan sistem
+  if (!m.text && !m.message && !m.msg) return true
+  if (m.mtype === 'reactionMessage' || m.mtype === 'protocolMessage') return true
 
-  if (user.afk > -1) {
-    let afkDuration = new Date() - user.afk;
-    await m.reply(`
-🎉 *Selamat Datang Kembali, Sensei!* 🎉
+  // 1. WELCOME BACK (User kirim chat saat masih AFK)
+  if (user && user.afk > -1) {
+    let afkDuration = new Date() - user.afk
+    let welcome = `
+✨ *A F K  O F F* ✨
+━━━━━━━━━━━━━━━━━━━━━━
 
-kamu telah berhenti dari mode AFK${user.afkReason ? ` setelah:\n📝 *Alasan:* "${user.afkReason}"` : '.'}
-😴 *Total Durasi AFK:* ${clockString(afkDuration)}
+*Okaerinasai, ${m.pushName || 'User'}!*
 
-Semoga hari mu senin terus! ✨
-`.trim(), null, { quoted: fkontak });
-    user.afk = -1;
-    user.afkReason = '';
+📊 *Data Sesi Terakhir:*
+•── *Durasi:* ${clockString(afkDuration)}
+•── *Alasan:* ${user.afkReason ? user.afkReason : 'Tanpa alasan'}
+
+> *“Senang melihatmu kembali. Euphy siap menerima perintah lagi! 🌸”*
+    `.trim()
+
+    await conn.reply(m.chat, welcome, m)
+    user.afk = -1
+    user.afkReason = ''
   }
 
-  let jids = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])];
-  if (jids.length > 0) {
-    for (let jid of jids) {
-      if (jid === m.sender) continue;
-      let mentionedUser = global.db.data.users[jid];
-      if (!mentionedUser || mentionedUser.afk < 0) continue;
+  // 2. MENTION DETECTOR (Ada yang ngetag orang AFK)
+  let jids = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])]
+  for (let jid of jids) {
+    if (jid === m.sender) continue
+    let mentionedUser = global.db.data.users[jid]
+    if (!mentionedUser || mentionedUser.afk < 0) continue
 
-      let afkTime = mentionedUser.afk;
-      let reason = mentionedUser.afkReason || '';
-      let afkDuration = new Date() - afkTime;
+    let afkTime = mentionedUser.afk
+    let reason = mentionedUser.afkReason || 'Tanpa keterangan'
+    let afkDuration = new Date() - afkTime
 
-      let mentionedUserName = conn.getName(jid); // Pastikan 'conn' di-pass ke handler.before
+    let notify = `
+╭━━〔 ⚠️ *U S E R  A F K* 〕━━
+┃
+┃ 👤 *User:* ${conn.getName(jid)}
+┃ 🕒 *Since:* ${clockString(afkDuration)} ago
+┃ 💬 *Pesan:* ${reason}
+┃
+╰━━━━━━━━━━━━━━━⬣
 
-      await m.reply(`
-🤫 *Sssstt... Jangan Ganggu!* 🤫
+> *“Ssstt! Orangnya lagi nggak ada. Jangan di-spam ya, nanti Euphy jewer! 💢”*
+    `.trim()
 
-Pengguna *${mentionedUserName}* (@${jid.replace(/@.+/, '')}) sedang dalam mode AFK.
-${reason ? `💬 *Alasan:* "${reason}"` : '🚫 *Tanpa alasan khusus.*'}
-
-⏳ *Sudah AFK Selama:* ${clockString(afkDuration)}
-
-Jangan tag sensei, sampai kembali aktif ya! 🙏
-`.trim(), null, { quoted: fkontak });
-    }
+    await conn.reply(m.chat, notify, m)
   }
-  return true;
-};
+  return true
+}
 
-module.exports = handler;
+module.exports = handler
 
 function clockString(ms) {
-  if (isNaN(ms) || ms < 0) return 'sebentar tadi';
-  let h = Math.floor(ms / 3600000);
-  let m = Math.floor(ms / 60000) % 60;
-  let s = Math.floor(ms / 1000) % 60;
-
-  let H = h.toString().padStart(2, '0');
-  let M = m.toString().padStart(2, '0');
-  let S = s.toString().padStart(2, '0');
-
-  if (h > 0) {
-    return `${H} jam ${M} menit ${S} detik`;
-  } else if (m > 0) {
-    return `${M} menit ${S} detik`;
-  } else {
-    return `${S} detik`;
-  }
+  let h = isNaN(ms) ? 0 : Math.floor(ms / 3600000)
+  let m = isNaN(ms) ? 0 : Math.floor(ms / 60000) % 60
+  let s = isNaN(ms) ? 0 : Math.floor(ms / 1000) % 60
+  
+  let res = []
+  if (h > 0) res.push(`${h}j`)
+  if (m > 0) res.push(`${m}m`)
+  res.push(`${s}s`)
+  return res.join(' ')
 }
