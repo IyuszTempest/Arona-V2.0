@@ -81,9 +81,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['bluearchivechar <karakter>', 'bachar <karakter>'];
-handler.tags = ['anime', 'fun'];
-handler.command = ['bluearchivechar', 'bachar'];
+handler.help = ['bachar <karakter>'];
+handler.tags = ['anime'];
+handler.command = ['bachar'];
 handler.limit = true;
 
 module.exports = handler;
