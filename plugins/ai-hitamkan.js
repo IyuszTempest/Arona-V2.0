@@ -76,7 +76,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 };
 
 handler.help = ['hitamkan'];
-handler.tags = ['anime','ai'];
+handler.tags = ['ai'];
 handler.command = /^hitamkan$/i;
 
 module.exports = handler;
