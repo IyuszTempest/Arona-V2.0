@@ -155,9 +155,9 @@ handler.before = async function(m, { conn }) {
     }
 };
 
-handler.help = ["euphy <teks/media>", "reseteuphy", ".aieuphy <on|off|status>"];
+handler.help = ["euphylia <teks/media>", "reseteuphy", ".aieuphy <on|off|status>"];
 handler.tags = ["ai"];
-handler.command = /^(aieuphy|reseteuphy|euphy|euphylia)$/i;
+handler.command = /^(reseteuphy|euphylia|aieuphy)$/i;
 handler.limit = true;
 handler.premium = false;
 handler.group = true;
