@@ -27,7 +27,7 @@ END:VCARD`
     };
     
     if (!args[0]) {
-        return conn.reply(m.chat, `Mau cari gambar Konachan apa, masbro?\n\n*Contoh:* *${usedPrefix + command}* azur_lane`, fkontak);
+        return conn.reply(m.chat, `Mau cari gambar Konachan apa?\n\n*Contoh:* *${usedPrefix + command}* azur_lane`, fkontak);
     }
 
     try {
@@ -61,7 +61,7 @@ END:VCARD`
 };
 
 handler.help = ['konachan <query>'];
-handler.tags = ['nsfw', 'premium', 'anime'];
+handler.tags = ['nsfw', 'premium'];
 handler.command = /^(konachan|ksearch)$/i;
 handler.nsfw = true;
 handler.premium = true;
