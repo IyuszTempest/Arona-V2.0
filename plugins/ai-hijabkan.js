@@ -91,7 +91,7 @@ let handler = async (m, { conn, args, text, usedPrefix, command }) => {
 };
 
 handler.help = ["hijabkan"];
-handler.tags = ["anime","premium","ai"];
+handler.tags = ["premium","ai"];
 handler.command = ["hijabkan"];
 
 handler.premium = true;
