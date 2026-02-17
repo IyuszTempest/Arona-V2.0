@@ -41,7 +41,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['cosplay'];
-handler.tags = ['image', 'premium', 'anime'];
+handler.tags = ['premium', 'anime'];
 handler.command = /^(cosplay)$/i;
 handler.premium = true;
 handler.limit = true;
