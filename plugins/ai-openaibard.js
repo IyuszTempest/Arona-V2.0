@@ -46,7 +46,7 @@ let handler = async (m, { conn, text, command, usedPrefix }) => {
 }
 
 handler.help = ['bardimg', 'bardimage', 'bardvideo', 'bardaudio'];
-handler.tags = ['tools', 'ai'];
+handler.tags = ['ai'];
 handler.command = /^(bardimg|bardimage|bardvideo|bardaudio)$/i;
 handler.limit = true;
 
