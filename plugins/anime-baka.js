@@ -49,8 +49,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['baka'];
-handler.tags = ['image', 'anime', 'premium'];
-handler.command = /^(baka|randombaka)$/i;
+handler.tags = ['anime', 'premium'];
+handler.command = /^(baka)$/i;
 handler.limit = true;
 handler.premium = true;
 
