@@ -69,9 +69,9 @@ const handler = async (m, { conn, text }) => {
   }
 };
 
-handler.help = ['birthdayanime', 'ultahanime <nama anime>'];
+handler.help = ['ultahanime <nama anime>'];
 handler.tags = ['anime'];
-handler.command = /^(ultahanime|birthdayanime)$/i;
+handler.command = /^(ultahanime)$/i;
 handler.limit = true;
 handler.register = true;
 
