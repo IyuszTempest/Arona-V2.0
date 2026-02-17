@@ -48,9 +48,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['hentaiwaifu'];
+handler.help = ['hwaifu'];
 handler.tags = ['nsfw', 'premium'];
-handler.command = /^(hentaiwaifu|hwaifu)$/i;
+handler.command = /^(hwaifu)$/i;
 handler.nsfw = true;
 handler.premium = true;
 handler.limit = true;
