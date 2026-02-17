@@ -49,7 +49,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['husbu'];
-handler.tags = ['image', 'anime'];
+handler.tags = ['anime'];
 handler.command = /^(husbu)$/i;
 handler.limit = true;
 
