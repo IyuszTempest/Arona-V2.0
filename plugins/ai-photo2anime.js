@@ -210,9 +210,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['foto2anime'];
-handler.tags = ['ai', 'image', 'anime']; // Tambah tag 'anime'
-handler.command = /^(photo2anime|foto2anime|f2anime)$/i; // Tambah alias command
+handler.help = ['f2anime'];
+handler.tags = ['ai']; // Tambah tag 'anime'
+handler.command = /^(f2anime)$/i; // Tambah alias command
 handler.limit = true; // Bisa pakai limit
 handler.premium = false; // Ini API gratis, tidak perlu premium
 
