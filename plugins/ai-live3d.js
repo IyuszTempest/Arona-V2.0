@@ -178,7 +178,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['live3d <prompt>|<style>'];
 handler.tags = ['ai', 'premium','nsfw'];
-handler.command = /^(live3d|live3dai|chibi)$/i;
+handler.command = /^(live3d)$/i;
 handler.limit = true; // Tambahkan jika perlu limitasi
 handler.premium = true; // Ganti jadi true jika command premium
 
