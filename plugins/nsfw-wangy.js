@@ -52,7 +52,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['wangy'];
-handler.tags = ['anime', 'nsfw', 'premium'];
+handler.tags = ['nsfw', 'premium'];
 handler.command = /^(wangy)$/i;
 handler.premium = true;
 handler.nsfw = true;
