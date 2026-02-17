@@ -71,8 +71,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 };
 
 handler.help = ['nekos <type>'];
-handler.tags = ['anime', 'image'];
-handler.command = /^(nekos|nekoslife)$/i;
+handler.tags = ['anime'];
+handler.command = /^(nekos)$/i;
 handler.limit = true;
 handler.premium = false;
 
