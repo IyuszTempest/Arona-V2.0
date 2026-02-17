@@ -59,7 +59,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         participant: "0@s.whatsapp.net"
     };
     if (!text) {
-        return conn.reply(m.chat, `Mau cari anime apa, masbro? Contoh: *${usedPrefix + command}* Jujutsu Kaisen`, fkontak);
+        return conn.reply(m.chat, `Mau cari anime apa? Contoh: *${usedPrefix + command}* Jujutsu Kaisen`, fkontak);
     }
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
     try {
@@ -114,8 +114,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 };
 
 handler.help = ['jikan <keyword>'];
-handler.tags = ['anime', 'info', 'internet'];
-handler.command = /^(malinfo|jikan)$/i;
+handler.tags = ['anime'];
+handler.command = /^(jikan)$/i;
 handler.limit = true;
 handler.premium = false;
 
