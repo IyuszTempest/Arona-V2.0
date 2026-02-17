@@ -235,9 +235,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['waifutag', 'wdtag'];
-handler.tags = ['ai', 'image'];
-handler.command = /^(waifutag|wdtag|chardetect)$/i;
+handler.help = ['waifutag'];
+handler.tags = ['ai'];
+handler.command = /^(waifutag)$/i;
 handler.limit = true; // Tambahkan jika perlu limitasi
 handler.premium = false; // Ganti jadi true jika command premium
 
