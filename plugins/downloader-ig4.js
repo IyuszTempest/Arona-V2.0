@@ -209,9 +209,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['ig5 <link_instagram>'];
+handler.help = ['ig4 <link_instagram>'];
 handler.tags = ['downloader'];
-handler.command = /^(ig5|instagram5)$/i;
+handler.command = /^(ig5)$/i;
 handler.limit = true; 
 
 module.exports = handler;
