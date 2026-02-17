@@ -37,7 +37,7 @@ let handler = async (m, { conn }) => {
 };
 
 handler.help = ['cewekjepang'];
-handler.tags = ['anime','image','premium'];
+handler.tags = ['anime'];
 handler.command = /^cewekjepang$/i;
-handler.premium = true;
+handler.premium = false;
 module.exports = handler;
