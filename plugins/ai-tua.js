@@ -76,7 +76,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 };
 
 handler.help = ['tua'];
-handler.tags = ['anime','premium'];
+handler.tags = ['ai','premium'];
 handler.command = /^tua$/i;
 
 handler.premium = true;
