@@ -133,7 +133,7 @@ conn.reply(m.chat, `❌ Error: ${error.message}`, m)
 }
 handler.help = ['chardetect']
 handler.tags = ['ai']
-handler.command = /^(chardetect|detectchar|waifutag)$/i
+handler.command = /^(chardetect)$/i
 handler.register = true
 handler.limit = true
 module.exports = handler
