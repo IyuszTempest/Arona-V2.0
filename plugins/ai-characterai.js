@@ -1,10 +1,10 @@
 const fetch = require('node-fetch')
 
 let handler = async (m, { text, usedPrefix, command }) => {
-  if (!text) throw(`Input Text Dan Karakter!\nExample: ${usedPrefix + command} Kirito|kamu sedang apa?`)    
+  if (!text) throw(`Berikan Text Dan Karakter!\nExample: ${usedPrefix + command} Euphylia|kamu sedang apa?`)    
   try {
     let [ logic, prompt ] = text.split('|')
-    m.reply(`Tunggu sebentar...`)
+    m.reply(`Wait...`)
     let res = await fetch(`https://api.botcahx.eu.org/api/search/c-ai?apikey=${btc}&char=${logic}&prompt=${prompt}`)
     let json = await res.json()
     m.reply(json.message)
@@ -13,7 +13,7 @@ let handler = async (m, { text, usedPrefix, command }) => {
   }
 }
 
-handler.command = handler.help = ['c-ai','character-ai','cai']
+handler.command = handler.help = ['cai']
 handler.tags = ['tools']
 handler.owner = false
 handler.limit = true
