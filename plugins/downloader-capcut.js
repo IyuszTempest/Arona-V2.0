@@ -21,7 +21,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     };
 
     if (!args[0]) {
-        return conn.reply(m.chat, `Mana link CapCut-nya, masbro?\n\nContoh: *${usedPrefix + command}* https://www.capcut.com/template/xxxxx`, fkontak);
+        return conn.reply(m.chat, `Mana link CapCut-nya?\n\nContoh: *${usedPrefix + command}* https://www.capcut.com/template/xxxxx`, fkontak);
     }
     
     let url = args[0];
@@ -31,7 +31,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
     try {
         if (!global.fgsiapi) {
-            return conn.reply(m.chat, 'Maaf, API key FGSI belum diisi di config.js. Silakan isi dulu ya, masbro!', fkontak);
+            return conn.reply(m.chat, 'Maaf, API key FGSI belum diisi di config.js. Silakan isi dulu ya', fkontak);
         }
 
         await conn.reply(m.chat, global.wait, fkontak);
@@ -67,7 +67,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
 handler.help = ['capcut <url>'];
 handler.tags = ['downloader'];
-handler.command = /^(capcut|capcutdl)$/i;
+handler.command = /^(capcut)$/i;
 handler.limit = true;
 
 module.exports = handler;
