@@ -101,7 +101,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => { // Ganti 'args
 }
 
 handler.help = ['fb2 <url>'];
-handler.command = ['fb2', 'facebook2'];
+handler.command = ['fb2'];
 handler.tags = ['downloader'];
 handler.limit = true; // Bisa pakai limit
 handler.premium = false; // Ganti jadi true jika command premium
