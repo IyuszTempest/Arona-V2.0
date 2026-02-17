@@ -146,9 +146,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 };
 
-handler.help = ['puisi <topik>|<panjang>|<tipe>|<bahasa>'];
-handler.tags = ['ai', 'fun'];
-handler.command = /^(puisi|poem|generatepoem)$/i;
+handler.help = ['puisiai <topik>|<panjang>|<tipe>|<bahasa>'];
+handler.tags = ['ai'];
+handler.command = /^(puisiai)$/i;
 handler.limit = true; // Tambahkan jika perlu limitasi
 handler.premium = false; // Ganti jadi true jika command premium
 
