@@ -146,7 +146,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
             throw new Error('Gagal mengunduh gambar dari pesan.');
         }
 
-        await conn.reply(m.chat, '🔄 *Memulai proses konversi ke sketsa...*', fkontak);
+        await conn.reply(m.chat, '🔄 *OTW konversi ke sketsa...*', fkontak);
         const sketchUrl = await imageToSketch(imageBuffer);
         
         if (!sketchUrl) {
@@ -168,7 +168,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['tosketch'];
-handler.tags = ['ai', 'image', 'tools', 'premium']; 
+handler.tags = ['ai', 'premium']; 
 handler.command = /^(tosketch)$/i;
 handler.limit = true; 
 handler.premium = true; 
