@@ -121,7 +121,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['pixivdl <id/url>', 'pxdl <id/url>']
 handler.tags = ['downloader']
-handler.command = /^(pixivdl|pxdl)$/i
+handler.command = /^(pixivdl)$/i
 handler.limit = true
 
 module.exports = handler
