@@ -90,7 +90,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['snackvideo <url>'];
 handler.tags = ['downloader'];
-handler.command = /^(snackvideo|snackvdl)$/i;
+handler.command = /^(snackvideo)$/i;
 handler.limit = true; // Bisa pakai limit
 handler.premium = false;
 
