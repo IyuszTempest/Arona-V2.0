@@ -342,7 +342,7 @@ let handler = async (m, {
 };
 
 handler.help = ['ailabs <prompt> --image|--video'];
-handler.tags = ['ai', 'maker'];
+handler.tags = ['ai'];
 handler.command = /^ailabs$/i;
 handler.limit = true;
 handler.premium = true;
