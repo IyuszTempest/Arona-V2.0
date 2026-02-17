@@ -189,7 +189,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['saveplay <link>'];
 handler.tags = ['downloader'];
-handler.command = ['saveplay', 'bili', 'twitterdl', 'fb']; // Tambahkan alias command
+handler.command = ['saveplay', 'bili', 'twitterdl', 'fb5']; // Tambahkan alias command
 handler.limit = true; // Tambahkan jika perlu limitasi
 handler.premium = false; // Ganti jadi true jika command premium
 
