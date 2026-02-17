@@ -21,5 +21,5 @@ m.reply(e.message)
 }
 handler.help = ['imgprompt']
 handler.command = ['imgprompt']
-handler.tags = ['tools','ai']
+handler.tags = ['ai']
 module.exports = handler
