@@ -38,14 +38,14 @@ async function amdata(url) {
 // Handler untuk bot (contoh sederhana)
 async function handler(m, { conn, text, command }) {
     if (!text) {
-        return conn.reply(m.chat, `Masbro, kasih gw link share Alight Motion dong!\nContoh: *${command} https://alightcreative.com/am/share/u/RsfkC8TAxpVcTxPTdlFaC7Y9AFq2/p/U4xccZ37om-45162df0719976ec*`, m);
+        return conn.reply(m.chat, `kasih aku link share Alight Motion dong!\nContoh: *${command} https://alightcreative.com/am/share/u/RsfkC8TAxpVcTxPTdlFaC7Y9AFq2/p/U4xccZ37om-45162df0719976ec*`, m);
     }
 
     if (!text.startsWith('https://alightcreative.com/am/share/')) {
-        return conn.reply(m.chat, 'Itu bukan link share Alight Motion yang valid, masbro. Coba cek lagi deh.', m);
+        return conn.reply(m.chat, 'Itu bukan link share Alight Motion yang valid. Coba cek lagi deh.', m);
     }
 
-    await conn.reply(m.chat, 'Oke, gw lagi nyari data preset Alight Motionnya nih, sabar ya masbro...', m);
+    await conn.reply(m.chat, 'Oke, gw lagi nyari data preset Alight Motionnya nih, sabar ya...', m);
 
     try {
         const result = await amdata(text);
@@ -72,12 +72,12 @@ async function handler(m, { conn, text, command }) {
 
     } catch (e) {
         console.error('Error in handler (alightmotion.js):', e);
-        await conn.reply(m.chat, `Aduh, ada error nih pas ngambil data Alight Motion: ${e.message}. Coba lagi nanti atau cek linknya ya, masbro.`, m);
+        await conn.reply(m.chat, `Aduh, ada error nih pas ngambil data Alight Motion: ${e.message}. Coba lagi nanti atau cek linknya ya`, m);
     }
 }
 
 handler.help = ['alightmotion <url>'];
 handler.tags = ['downloader'];
-handler.command = /^(alightmotion|amdata)$/i;
+handler.command = /^(alightmotion)$/i;
 
 module.exports = handler;
