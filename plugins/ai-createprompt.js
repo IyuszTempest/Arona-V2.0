@@ -26,9 +26,9 @@ let handler = async (m, { text, usedPrefix, command }) => {
   }
 };
 
-handler.help = ['createprompt <teks>'];
-handler.tags = ['tools','ai'];
-handler.command = /^createprompt|buatprompt$/i;
+handler.help = ['buatprompt <teks>'];
+handler.tags = ['ai'];
+handler.command = /^buatprompt$/i;
 
 module.exports = handler;
 
