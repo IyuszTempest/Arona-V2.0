@@ -77,8 +77,8 @@ ${synopsis}\n\nA R O N A  I N F O`;
     conn.reply('🚩 Sorry, I couldn\'t process your request.')
   }
 };
-handler.help = ["animeinfo *<text>*"];
+handler.help = ["anime *<text>*"];
 handler.tags = ["anime"];
-handler.command = /^(animeinfo|anime|infoanime)$/i;
+handler.command = /^(anime)$/i;
 
 module.exports = handler;
