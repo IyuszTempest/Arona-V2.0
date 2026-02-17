@@ -123,9 +123,9 @@ let handler = async (m, { conn, usedPrefix, command }) => { // Tambahkan usedPre
   }
 };
 
-handler.help = ['randomba', 'bluearchive'];
-handler.tags = ['anime', 'image'];
-handler.command = /^(bluearchive|randomba|ba)$/i; // Tambah alias 'ba'
+handler.help = ['bluearchive'];
+handler.tags = ['anime'];
+handler.command = /^(bluearchive)$/i; // Tambah alias 'ba'
 handler.limit = true;
 handler.premium = false;
 
