@@ -9,7 +9,7 @@ const axios = require ('axios')
 
 const handler = async (m, { conn, text, command }) => {
   if (!text) return conn.sendMessage(m.chat, {
-    text: `Mana linknya, dasar sensei bodoh!\n\nContoh:\n.${command} https://id.pinterest.com/pin/16044142417873989/`
+    text: `Mana linknya, bodoh!\n\nContoh:\n.${command} https://id.pinterest.com/pin/16044142417873989/`
   }, { quoted: m })
 
   await conn.sendMessage(m.chat, {
@@ -23,7 +23,7 @@ const handler = async (m, { conn, text, command }) => {
         react: { text: '❌', key: m.key }
       })
       return conn.sendMessage(m.chat, {
-        text: '😡 Gagal dapetin gambar! Mungkin link-nya ngaco, coba lagi sensei!'
+        text: '😡 Gagal dapetin gambar! Mungkin link-nya ngaco, coba lagi!'
       }, { quoted: m })
     }
 
