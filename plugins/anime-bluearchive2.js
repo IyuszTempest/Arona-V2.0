@@ -40,8 +40,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 };
 
 handler.help = ['bluearchive2'];
-handler.tags = ['anime', 'image'];
+handler.tags = ['anime'];
 handler.command = ['bluearchive2'];
 handler.limit = true;
+
 
 module.exports = handler;
