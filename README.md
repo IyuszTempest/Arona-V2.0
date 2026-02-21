@@ -1,53 +1,59 @@
-# ✨ Arona V2.0 ✨
-_Bot WhatsApp Multi-platform dengan Teknologi AI & Fitur Lengkap_
+<div align="center">
 
-Arona V2.0 adalah bot WhatsApp berbasis Node.js yang dirancang untuk mempermudah berbagai aktivitas di grup maupun chat pribadi. Bot ini dibangun dengan kombinasi **scraper** dan **Rest API**, menggunakan **tipe plugin CJS**.
+# ✨ Euphylia Magenta V1 ✨
+<img src="https://i.ibb.co/YF9vK9NK/IMG-20260218-WA0085.jpg" width="250" alt="Euphylia Magenta">
 
-## 🚀 Fitur Utama
+**Bot WhatsApp Multi-platform dengan Teknologi AI & Fitur Lengkap**
+*Base Script & API by Botcahx*
 
--   🤖 **AI Terintegrasi:** Didukung oleh API Gemini AI untuk percakapan cerdas dan analisis gambar/video.
--   🎵 **All-in-One Downloader:** Unduh media dari berbagai platform seperti Spotify, TikTok, Instagram, Facebook, dan lainnya.
--   🖼️ **Image & Video Tools:** Hapus background dari gambar/video, buat stiker, dan lain-lain.
--   ⚙️ **Customizable:** Mudah dikonfigurasi, dengan semua API key terpusat di `config.js` untuk keamanan dan kemudahan.
--   ✅ **Menggunakan Baileys Latest Resmi**
--   ✅ **Menggunakan Pairing Code**
--   ✅ **Node.js 20+** diperlukan.
--   ✅ **Setengahnya menggunakan Scraper dan Rest Api, sisanya Apikey**
--   ✅ **Type Plugins CJS**
--   ✅ **Sudah ada lid**
--   ✨ **Beberapa fitur menggunakan rest api pribadi (Euphy API by IyuszTempest)**
--   ✨ **Pengguna bot bisa lapor fitur error via bot dan laporan akan terkirim ke nomer owner, contoh: .laporerror fitur hd rusak nih**
+[![Node.js Version](https://img.shields.io/badge/Node.js-20+-green.svg?style=for-the-badge&logo=nodedotjs)](https://nodejs.org)
+[![Types](https://img.shields.io/badge/Type-CJS_Plugins-orange.svg?style=for-the-badge&logo=javascript)](#)
+[![Library](https://img.shields.io/badge/Library-Baileys_Official-blue.svg?style=for-the-badge)](#)
 
-![Arona](https://files.catbox.moe/mskrgn.png)
-
-
-## ⚠️ Perhatian Sebelum Instalasi
-
--   ❌ **Tidak support** Termux atau panel yang tidak memiliki `ffmpeg`, `imagemagick`, dan `webp`.
--   **Wajib** mengisi semua API key di `config.js` agar bot berfungsi maksimal.
--   Sudah support lid, silahkan diatur di `config.js`.
-
-## 🔐 Konfigurasi API Keys
-
-Semua API key harus diisi di file `config.js`, silakan cek langsung di `config.js` untuk API key yang digunakan.
-
--   📌 **Botcahx Api:** [`Daftar di sini`](https://api.botcahx.eu.org)
--   🤖 **Gemini AI & Maker:** [`Daftar di sini`](https://ai.google.dev/gemini-api/docs)
--   📌 **Betabotz Api:** [`Daftar di sini`](https://api.betabotz.eu.org)
--   📌 **Fgsi Api:** [`Link API`](https://fgsi.koyeb.app/)
--   📌 **Lolhuman Api:** [`Link API`](https://api.lolhuman.xyz/)
-
-## **Credit**  
-<a href="https://github.com/IyuszTempest"><img src="https://github.com/IyuszTempest.png?size=100" width="100" height="100"></a> | [![Tio](https://github.com/BOTCAHX.png?size=100)](https://github.com/BOTCAHX)  
----|---  
-[IyuszTempest](https://github.com/IyuszTempest)  | [Tio](https://github.com/BOTCAHX)  
-Owner Bot Arona | Yang punya base
+</div>
 
 ---
 
-## 📢 Informasi & Update
-📢 **WhatsApp Channel:** [Klik di sini](https://whatsapp.com/channel/0029VaUAQxUHwXb4O5mN610c)
+## 🌸 Overview
+**Euphylia Magenta V1** (atau **Euphy**) adalah bot WhatsApp berbasis Node.js yang dikembangkan menggunakan **Base dari Botcahx**. Bot ini dirancang untuk stabilitas tinggi dengan kombinasi fitur scraper dan API yang canggih.
 
-📌 Jika ada plugins yang belum ditaruh credit kalian, silahkan hubungi saya agar di add credit di plugins script ini!!
+## 🚀 Fitur Utama
 
-Hubungi Via WhatsApp: https://wa.me/message/TTWL53ZARYQBK1
+- 🤖 **AI Terintegrasi:** Menggunakan API Gemini AI untuk obrolan interaktif dan deteksi gambar/video.
+- 🎵 **All-in-One Downloader:** Fitur unggulan dari **Botcahx** untuk unduh media Spotify, TikTok, IG, FB, dll.
+- 🖼️ **Image & Video Tools:** Alat pengolah stiker, remove background, dan multimedia lainnya.
+- ⚡ **Modern Engine:** Menggunakan **Baileys Latest** (Official) dengan sistem **Pairing Code**.
+- 🛠️ **Error System:** User bisa lapor bug via `.laporerror`, pesan akan diteruskan ke Owner.
+- 💎 **Custom API:** Sebagian fitur menggunakan **Euphy API by IyuszTempest**.
+
+---
+
+## ⚠️ Perhatian Sebelum Instalasi
+
+> [!IMPORTANT]
+> - **Wajib** install `ffmpeg`, `imagemagick`, dan `webp` di VPS/Panel Anda.
+> - **Node.js 20+** diperlukan agar semua library berjalan mulus.
+> - Tidak disarankan untuk Termux karena keterbatasan resource library pendukung.
+
+---
+
+## 🔐 Konfigurasi & Credit API
+
+Silakan mendaftar di panel penyedia API berikut untuk mendapatkan fungsionalitas penuh:
+
+| Provider | Deskripsi | Link |
+| :--- | :--- | :--- |
+| **Botcahx API** | **Main Base & Features** | [Daftar di sini](https://api.botcahx.eu.org) |
+| **Gemini AI** | AI & Logic System | [Daftar di sini](https://ai.google.dev/) |
+| **Betabotz API** | Additional Plugins | [Daftar di sini](https://api.betabotz.eu.org) |
+
+---
+
+<div align="center">
+
+### 🛡️ Credits & Thanks To:
+**Botcahx** (Base Script & Main API) | **IyuszTempest** (Developer & Euphy API)
+
+*Jangan lupa berikan Star ⭐ jika Kamu menyukai project ini!*
+
+</div>
